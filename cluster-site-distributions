@@ -1,0 +1,389 @@
+#!/usr/bin/env python3
+import argparse
+# import subprocess
+from functools import reduce
+# import os
+
+from math import exp
+from math import log
+from math import sqrt
+import numpy as np
+import pandas as pd
+from sklearn.cluster import KMeans
+
+citation = """Empirical distribution mixture models. Developed by Dominik Schrempf (2019).
+"""
+
+desc = """Cluster site distributions. Each amino acid frequency distribution
+distribution is considered as a point in twenty dimensional space. The K-Means
+clustering algorithm is used to label the points from 1 to K, with different
+values of K. The clusters are output in various file formats, readily usable
+with IQ-TREE [1], Phylobayes [2], and RevBayes [3].
+
+Before clustering, coordinate transformations can be applied.
+
+Implemented transformations:
+- centered log ratio (CLR) transform [4]
+- log centered log ratio (LCLR) transform [5]
+
+Basically, points close to the boundaries, that is, where some coordinates have
+very low probability, will be projected to a position that is very far away
+from points that have high diversity and intermediate frequency values for all
+coordinates.
+
+The site distribution files are expected to be tab separated, and of the
+following form:
+
+----------------------------------------------------------------------
+A C D E F G H I K L M N P Q R S T V W Y
+
+1	0.008	0.001	0.001	0.007	0.002	0.004	0.01	0.006	0.14	0.006	0.005	0.009	0.002	0.01	0.7	0.009	0.01	0.006	0.002	0.003
+2	...
+...
+----------------------------------------------------------------------
+
+"""
+desc += citation
+
+epilog = """
+
+[1] Nguyen, L., Schmidt, H. A., von Haeseler, A., & Minh, B. Q. (2015).
+Iq-tree: a fast and effective stochastic algorithm for estimating
+maximum-likelihood phylogenies. Molecular Biology and Evolution, 32(1),
+268–274. http://dx.doi.org/10.1093/molbev/msu300
+
+[2] Lartillot, N., Rodrigue, N., Stubbs, D., & Richer, J. (2013). Phylobayes
+mpi: phylogenetic reconstruction with infinite mixtures of profiles in a
+parallel environment. Systematic Biology, 62(4), 611–615.
+http://dx.doi.org/10.1093/sysbio/syt022
+
+[3] Höhna, S., Landis, M. J., Heath, T. A., Boussau, B., Lartillot, N., Moore,
+B. R., Huelsenbeck, J. P., … (2016). Revbayes: bayesian phylogenetic inference
+using graphical models and an interactive model-specification language.
+Systematic Biology, 65(4), 726–736. http://dx.doi.org/10.1093/sysbio/syw021
+
+[4] Aitchison, J. (1982). The statistical analysis of compositional data.
+Journal of the Royal Statistical Society, Series B (Methological), 44(2),
+139–177.
+
+[5] Godichon-Baggioni, A., Maugis-Rabusseau, C., & Rau, A. (2017).
+Clustering transformed compositional data using K-means, with applications in
+gene expression and bicycle sharing system data. ArXiv, 1–32.
+
+"""
+
+
+class CustomFormatter(argparse.ArgumentDefaultsHelpFormatter,
+                      argparse.RawDescriptionHelpFormatter):
+    pass
+
+
+def parse_arguments():
+    parser = argparse.ArgumentParser(
+        formatter_class=CustomFormatter,
+        description=desc,
+        epilog=epilog)
+    parser.add_argument("filenames", nargs='+',
+                        help="Names of files containing site distributions")
+    parser.add_argument("--transformation", "-t", default="None",
+                        choices=["none", "clr", "lclr"],
+                        help="Transformation (default: %(default)s)")
+    parser.add_argument("-k", default=64, type=int,
+                        help="Number of clusters (default: %(default)s)")
+    parser.add_argument('-p', "--prefix", help="Prefix of output files.",
+                        default=None)
+    return parser.parse_args()
+
+
+args = parse_arguments()
+fns = args.filenames
+transformation = args.transformation
+k = args.k
+prefix = args.prefix
+
+# Definitions.
+amino_acids = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P",
+               "Q", "R", "S", "T", "V", "W", "Y"]
+n_aa = 20
+# create_nicologos = True
+
+print(citation)
+
+
+def np_array_to_string(a, d=' '):
+    """Convert a numpy array to a string."""
+    # Generate an array with strings.
+    x_arrstr = np.char.mod('%.16f', a)
+    # Combine to a string.
+    return d.join(x_arrstr)
+
+
+def read_site_distribution_pd(fn, v=False):
+    """Read posterior mean site frequencies from FN using pandas."""
+    if v:
+        print("Reading file:", fn)
+    # Skip header (first two rows).
+    data = pd.read_csv(fn, sep="\t", header=None, skiprows=1)
+    #  Skip positional information (first column).
+    data = data.iloc[:, 1:]
+    # Set labels accordingly.
+    data.columns = amino_acids
+    return data
+
+
+print("Read data.")
+data_array = list(map(read_site_distribution_pd, fns))
+data_conc = pd.concat(data_array, ignore_index=True)
+data = data_conc
+print(len(data), "site distributions read.")
+print("")
+
+print("First rows:")
+print(data.head())
+print("")
+
+
+# Definitions of transformations.
+def mean_geometric(a):
+    """Geometric mean of array 'a'."""
+    product = reduce((lambda x, y: x*y), a)
+    n = len(a)
+    return product ** (1/n)
+
+
+def clr(a):
+    """Return centered log ratio transformtion of array 'a'."""
+    g = mean_geometric(a)
+    try:
+        return a.apply(lambda x: log(x/g))
+    except AttributeError:
+        return np.array(list(map(lambda x: log(x/g), a)))
+
+
+def clr_inv(a):
+    """Inverse centered log ratio transform."""
+    try:
+        es = a.apply(exp)
+        g = 1/sum(es)
+        return es.apply(lambda x: g*x)
+    except AttributeError:
+        es = np.array(list(map(exp, a)))
+        g = 1.0/np.sum(es)
+        return np.array([g*x for x in es])
+
+
+def clr_df(df):
+    return df.apply(clr, axis=1)
+
+
+def clr_inv_df(df):
+    return df.apply(clr_inv, axis=1)
+
+
+def lclr(a):
+    """Log centered log ratio transformation of array-like 'a'."""
+    g = mean_geometric(a)
+
+    def f(x):
+        if x/g <= 1.0:
+            return -(log(1-log(x/g)))**2
+        else:
+            return log(x/g)**2
+
+    try:
+        return a.apply(f)
+    except AttributeError:
+        return np.array(list(map(f, a)))
+
+
+def lclr_df(df):
+    return df.apply(lclr, axis=1)
+
+
+def lclr_inv(a):
+    """Inverse log centered log ratio transform of array-like 'a'."""
+
+    def f_inv(x):
+        """Inverse without normalization."""
+        if x <= 0.0:
+            return exp(1.0 - exp(sqrt(-x)))
+        if x > 0.0:
+            return exp(sqrt(x))
+
+    try:
+        es = a.apply(f_inv)
+        g = 1/sum(es)
+        rval = es.apply(lambda x: g*x)
+    except AttributeError:
+        es = np.array(list(map(f_inv, a)))
+        g = 1.0/np.sum(es)
+        rval = np.array([g*x for x in es])
+    for val in rval:
+        if val <= 1e-6:
+            print("WARNING: Inverse transformation contains zero.")
+            continue
+    return rval
+
+
+def lclr_inv_df(df):
+    return df.apply(lclr_inv, axis=1)
+
+
+# Transform data.
+if transformation != "None":
+    print("Transform data.")
+    if transformation == "clr":
+        data_transformed = clr_df(data)
+        data_transformed_inv = clr_inv_df(data_transformed)
+    elif transformation == "lclr":
+        data_transformed = lclr_df(data)
+        data_transformed_inv = lclr_inv_df(data_transformed)
+    else:
+        raise ValueError("Transformation not known:", transformation)
+    print("Done.")
+    print("")
+    print("First rows of transformed data:")
+    print(data_transformed.head())
+    print("")
+    print("First rows of inversely transformed data (should be original data):")
+    print(data_transformed_inv.head())
+    print("")
+    data = data_transformed
+
+
+def get_weights(ls):
+    """Calculate cluster weights by counting points assigned to each label."""
+    counts = np.zeros(k, dtype=int)
+    for l in ls:
+        counts[l] += 1
+    s = np.sum(counts)
+    return counts/s
+
+
+def cluster(df, algorithm, args=(), kwds={}):
+    cl = algorithm(*args, **kwds)
+    labels = cl.fit_predict(df)
+    clusters = cl.cluster_centers_
+    return (labels, clusters)
+
+
+idx = pd.Index([i for i in range(k)], name=["Cluster index"])
+
+cls = pd.Index(["Weight", "Center"])
+clusters_all_lclr = pd.DataFrame([], index=idx, columns=cls)
+
+print("Number of clusters:", k)
+
+# Perform clustering.
+labels, clusters_raw = cluster(data, KMeans, kwds={'n_clusters': k})
+clusters = pd.DataFrame(clusters_raw)
+clusters_freq = clusters.apply(lclr_inv, axis=1)
+clusters_labels = labels
+clusters_freq = clusters_freq.values.tolist()
+weights = get_weights(clusters_labels)
+
+# Output.
+if prefix is not None:
+    fbn = prefix + "_"
+else:
+    fbn = ""
+fbn += "dists_" + transformation + "_" + str(k).zfill(3) + "clusters"
+
+clusters_df_unsorted = pd.DataFrame({"Weight": weights,
+                                     "Center": clusters_freq})
+clusters_df = clusters_df_unsorted.sort_values(by=["Weight"],
+                                               ascending=False)
+
+# Phylobayes.
+print("Write Phylobayes compatible output.")
+fn = fbn + "_pb.txt"
+with open(fn, 'w') as fo:
+    print("20", ' '.join(amino_acids), file=fo)
+    print(k, file=fo)
+    for w, c in zip(clusters_df["Weight"], clusters_df["Center"]):
+        print(w, np_array_to_string(c), file=fo)
+
+# # Nicologo.
+# if create_nicologos:
+#     if not os.path.isfile("modeheader"):
+#         print("WARNING: File 'modeheader' is missing, " +
+#               "Nicologo can not be created.")
+#         create_nicologos = False
+#     elif not os.path.isfile("seqheader"):
+#         print("WARNING: File 'seqheader' is missing, " +
+#               "Nicologo can not be created.")
+#         create_nicologos = False
+#     elif not os.path.isfile("prologo"):
+#         print("WARNING: Executable 'prologo' is missing, " +
+#               "Nicologo can not be created.")
+#         create_nicologos = False
+
+# if create_nicologos:
+#     fn = fbn + "_nicologo"
+#     fnt = fn + ".txt"
+#     with open(fnt, 'w') as fo:
+#         print(k, n_aa, file=fo)
+#         i = 0
+#         for w, c in zip(clusters_df["Weight"], clusters_df["Center"]):
+#             print(i, w, np_array_to_string(c), file=fo)
+#             i += 1
+#     nl = "./prologo"
+#     fnp = fn + ".ps"
+#     subprocess.call([nl, fnt, fnp])
+
+# IQ-TREE.
+print("Write IQ-TREE compatible output.")
+amino_acids_pb_dict = dict((a, i)
+                           for a, i in
+                           zip(amino_acids, range(n_aa)))
+amino_acids_iqtree = ['A', 'R', 'N', 'D', 'C', 'Q', 'E', 'G', 'H', 'I',
+                      'L', 'K', 'M', 'F', 'P', 'S', 'T', 'W', 'Y', 'V']
+amino_acids_iqtree_indices = [amino_acids_pb_dict[a]
+                              for a in amino_acids_iqtree]
+fn = fbn + "_iqtree.nex"
+with open(fn, 'w') as fo:
+    print("#nexus", file=fo)
+    print("begin models;", file=fo)
+    i = 0
+    class_names = []
+    for c in clusters_df["Center"]:
+        class_name = "FClass" + str(i).zfill(3)
+        class_names.append(class_name)
+        # Convert the order to the one used in IQ-TREE.
+        c_iqtree = [c[i] for i in amino_acids_iqtree_indices]
+        print("frequency ", class_name, " = ",
+              np_array_to_string(c_iqtree), ";", sep='', file=fo)
+        i += 1
+    print("", file=fo)
+    print("frequency CF", str(k).zfill(3), "Model = FMIX{",
+          ','.join(class_names), "};", sep='', file=fo)
+    print("end;", file=fo)
+
+# RevBayes.
+print("Write RevBayes compatible output.")
+fn = fbn + "_rb.txt"
+fn_basename_rb = fbn + "_rb"
+
+options = np.get_printoptions()
+np.set_printoptions(precision=16, threshold=None, linewidth=0)
+
+with open(fn, 'w') as fo:
+    print("# This script is generated automatically.", file=fo)
+    print("# Vector of amino acid stationary distributions.", file=fo)
+    print("distributions <- [", file=fo)
+    idt = "            "
+    first = True
+    for c in clusters_df["Center"]:
+        if first:
+            print(idt, "  ", c, sep='', file=fo)
+            first = False
+        else:
+            print(idt, ", ", c, sep='', file=fo)
+    print(idt, "]", sep='', file=fo)
+    print("# The number of clusters.", file=fo)
+    print("n_clusters <- ", k, sep='', file=fo)
+    print("# The base file name of this file (for reproducability).",
+          file=fo)
+    print("fn_distributions = \"", fn_basename_rb, "\"", sep='', file=fo)
+
+np.set_printoptions(options)
