@@ -1,0 +1,1930 @@
+%!PS-Adobe-2.0 EPSF-2.0
+%%Title: makelogo 8.69
+%%Creator: Tom Schneider, toms@ncifcrf.gov
+%%BoundingBox:    14    71   439   794
+%%Pages: atend
+%%DocumentFonts:
+%%EndComments
+/llx  14.2 def
+/lly  70.9 def
+/urx 439.4 def
+/ury 793.7 def
+% * alpro 1.70
+% *BalaenoA  141 bases  9888F0B5 checksum
+% * PROTEIN ALIGNMENT
+% * position, samples, information, variance
+%
+% logo from 1 to 146
+
+/cmfactor 72 2.54 div def % defines points -> cm conversion
+/cm {cmfactor mul} bind def % defines centimeters
+
+% user defined parameters
+/lowest 1 def
+/highest 146 def
+/bar 1 def
+/xcorner  3.50000 cm def
+/ycorner 20.00000 cm def
+/rotation -00.00000 def % degrees
+/charwidth  0.40878 cm def
+/minuscharwidth  -0.40878 cm def
+/barheight  2.33333 cm def
+/barwidth  0.02000 cm def
+/barbits  4.00000 def % bits
+/Ibeamfraction  1.00000 def
+/barends true def
+/showingbox false def
+/outline false def
+/caps true def
+/stacksperline 50 def
+/linesperpage 8 def
+/linemove  0.10000 def
+/numbering true def
+/shrinking false def
+/edgecontrol ( ) def
+/edgeleft  2.00000 def
+/edgeright  2.00000 def
+/edgelow  2.00000 def
+/edgehigh  2.00000 def
+/shrink  0.50000 def
+/ShowEnds (-) def % d: DNA, p: PROTEIN, -: none
+/HalfWhiteIbeam false def
+
+/knirhs 1 shrink sub 2 div def
+/charwidth4 charwidth 4 div def
+/charwidth2 charwidth 2 div def
+
+/setthelinewidth {1 setlinewidth} def
+setthelinewidth % set to normal linewidth
+
+% define fonts
+/ffss {findfont fontsize scalefont setfont} def
+/FontForStringRegular {/Times-Bold       ffss} def
+/FontForStringItalic  {/Times-BoldItalic ffss} def
+/FontForLogo          {/Helvetica-Bold   ffss} def
+/FontForPrime         {/Symbol           ffss} def
+/FontForSymbol        {/Symbol           ffss} def
+
+% Set up the font size for the graphics
+/fontsize charwidth def
+
+% movements to place 5' and 3' symbols
+/fivemovex {0} def
+/fivemovey {(0) charparams lx ux sub 3 mul} def
+/threemovex {(0) stringwidth pop 0.5 mul} def
+/threemovey {fivemovey} def
+/prime {FontForPrime (\242) show FontForStringRegular} def
+
+% make italics possible in titles
+/IT {% TRstring ITstring IT -
+  exch show
+  FontForStringItalic
+  show
+  FontForStringRegular
+} def
+
+
+% make symbols possible in titles
+/SY {% TRstring SYstring SY -
+  exch show
+  FontForSymbol
+  show
+  FontForStringRegular
+} def
+
+%(*[[ This special comment allows deletion of the repeated
+% procedures when several logos are concatenated together
+% See the censor program.
+
+/charparams { % char charparams => uy ux ly lx
+% takes a single character and returns the coordinates that
+% defines the outer bounds of where the ink goes
+  gsave
+    newpath
+    0 0 moveto
+    % take the character off the stack and use it here:
+    true charpath 
+    flattenpath
+    pathbbox % compute bounding box of 1 pt. char => lx ly ux uy
+    % the path is here, but toss it away ...
+  grestore
+  /uy exch def
+  /ux exch def
+  /ly exch def
+  /lx exch def
+} bind def
+
+/dashbox { % xsize ysize dashbox -
+% draw a dashed box of xsize by ysize (in points)
+  /ysize exch def % the y size of the box
+  /xsize exch def % the x size of the box
+  1 setlinewidth
+  gsave
+    % Define the width of the dashed lines for boxes:
+    newpath
+    0 0 moveto
+    xsize 0 lineto
+    xsize ysize lineto
+    0 ysize lineto
+    0 0 lineto
+    [3] 0 setdash
+    stroke
+  grestore
+  setthelinewidth
+} bind def
+
+/boxshow { % xsize ysize char boxshow
+% show the character with a box around it, sizes in points
+gsave
+  /tc exch def % define the character
+  /ysize exch def % the y size of the character
+  /xsize exch def % the x size of the character
+  /xmulfactor 1 def /ymulfactor 1 def
+
+  % if ysize is negative, make everything upside down!
+  ysize 0 lt {
+    % put ysize normal in this orientation
+    /ysize ysize abs def
+    xsize ysize translate
+    180 rotate
+  } if
+
+  shrinking {
+    xsize knirhs mul ysize knirhs mul translate
+    shrink shrink scale
+  } if
+
+  2 {
+    gsave
+    xmulfactor ymulfactor scale
+    tc charparams
+    grestore
+
+    ysize % desired size of character in points
+    uy ly sub % height of character in points
+    dup 0.0 ne {
+      div % factor by which to scale up the character
+      /ymulfactor exch def
+    } % end if
+    {pop pop}
+    ifelse
+
+    xsize % desired size of character in points
+    ux lx sub % width of character in points
+    dup 0.0 ne {
+      div % factor by which to scale up the character
+      /xmulfactor exch def
+    } % end if
+    {pop pop}
+    ifelse
+  } repeat
+
+  % Adjust horizontal position if the symbol is an I
+  tc (I) eq {charwidth 2 div % half of requested character width
+             ux lx sub 2 div % half of the actual character
+                sub      0 translate} if
+  % Avoid x scaling for I
+  tc (I) eq {/xmulfactor 1 def} if
+
+  /xmove xmulfactor lx mul neg def
+  /ymove ymulfactor ly mul neg def
+
+  newpath
+  xmove ymove moveto
+  xmulfactor ymulfactor scale
+
+  tc show
+grestore
+} def
+
+
+/numchar{ % charheight character numchar
+% Make a character of given height in cm,
+% then move vertically by that amount
+  gsave
+    /char exch def
+    /charheight exch cm def
+    char (N) eq {1 0.5 0 setrgbcolor} if
+    char (Q) eq {1 0.5 0 setrgbcolor} if
+    char (K) eq {0 1 0 setrgbcolor} if
+    char (R) eq {0 1 0 setrgbcolor} if
+    char (H) eq {0 1 0 setrgbcolor} if
+    char (D) eq {1 0 0 setrgbcolor} if
+    char (E) eq {1 0 0 setrgbcolor} if
+    char (F) eq {0 0.8 1 setrgbcolor} if
+    char (L) eq {0 0 1 setrgbcolor} if
+    char (I) eq {0 0 1 setrgbcolor} if
+    char (M) eq {0 0 1 setrgbcolor} if
+    char (V) eq {0 0 1 setrgbcolor} if
+    char (P) eq {0 0 0 setrgbcolor} if
+    char (T) eq {1 0 1 setrgbcolor} if
+    char (S) eq {1 0 1 setrgbcolor} if
+    char (C) eq {0 0 0 setrgbcolor} if
+    char (A) eq {1 0 1 setrgbcolor} if
+    char (G) eq {1 0 1 setrgbcolor} if
+    char (Y) eq {0 0.8 1 setrgbcolor} if
+    char (W) eq {0 0.8 1 setrgbcolor} if
+    charwidth charheight char boxshow
+  grestore
+  charheight abs 1 gt {0 charheight abs translate} if
+} bind def
+
+
+
+/Ibar{
+% make a horizontal bar
+gsave
+  newpath
+    charwidth4 neg 0 moveto
+    charwidth4 0 lineto
+  stroke
+grestore
+} bind def
+
+/Ibeam{ % height Ibeam
+% Make an Ibeam of twice the given height, in cm
+  /height exch cm def
+  /heightDRAW height Ibeamfraction mul def
+  1 setlinewidth
+     HalfWhiteIbeam outline not and
+     {0.75 setgray} % grey on bottom
+     {0 setgray} % black on bottom
+  ifelse
+  gsave
+    charwidth2 height neg translate
+    Ibar
+    newpath
+      0 0 moveto
+      0 heightDRAW rlineto
+    stroke
+    0 setgray % black on top
+    newpath
+      0 height moveto
+      0 height rmoveto
+      currentpoint translate
+    Ibar
+    newpath
+      0 0 moveto
+      0 heightDRAW neg rlineto
+      currentpoint translate
+    stroke
+  grestore
+  setthelinewidth
+} bind def
+
+/makenumber { % number makenumber
+% make the number
+gsave
+  shift % shift to the other side of the stack
+  90 rotate % rotate so the number fits
+  dup stringwidth pop % find the length of the number
+  neg % prepare for move
+  charwidth (0) charparams uy ly sub % height of numbers
+  sub 2 div %
+  moveto % move back to provide space
+  show
+grestore
+} bind def
+
+/shift{ % move to the next horizontal position
+charwidth 0 translate
+} bind def
+
+/bar2 barwidth 2 div def
+/bar2n bar2 neg def
+/makebar { % make a vertical bar at the current location
+gsave
+   bar2n 0 moveto
+   barwidth 0 rlineto
+   0 barheight rlineto
+   barwidth neg 0 rlineto
+   closepath
+   fill
+grestore
+} def
+
+% definitions for maketic
+/str 10 string def % string to hold number
+% points of movement between tic marks:
+% (abs protects against barbits being negative)
+/ticmovement barheight barbits abs div def
+
+/maketic { % make tic marks and numbers
+gsave
+  % initial increment limit proc for
+  0 1 barbits abs cvi
+  {/loopnumber exch def
+
+    % convert the number coming from the loop to a string
+    % and find its width
+    loopnumber 10 str cvrs
+    /stringnumber exch def % string representing the number
+
+    stringnumber stringwidth pop
+    /numberwidth exch def % width of number to show
+
+    /halfnumberheight
+      stringnumber charparams % capture sizes
+      uy ly sub 2 div
+    def
+
+    numberwidth 2 mul % move back two digits
+    neg loopnumber ticmovement mul % shift on y axis
+    halfnumberheight sub % down half the digit
+
+    moveto % move back the width of the string
+
+    % now show the tic mark
+    0 halfnumberheight rmoveto % shift up again
+    numberwidth 0 rmoveto
+    stroke
+  } for
+  grestore
+  gsave
+    /labelstring (%) def
+    numberwidth neg 2.5 mul
+    barheight
+    labelstring stringwidth pop
+    sub 2 div
+    translate
+    90 rotate
+    0 0 moveto
+  grestore
+} def
+
+/degpercycle 360 def
+ 
+/cosine {%    amplitude  phase  wavelength  base
+%             xmin ymin xmax ymax step dash thickness
+%             cosine -
+% draws a cosine wave with the given parameters:
+% amplitude (points): height of the wave
+% phase (points): starting point of the wave
+% wavelength (points): length from crest to crest
+% base (points): lowest point of the curve
+% xmin ymin xmax ymax (points): region in which to draw
+% step steps for drawing a cosine wave
+% dash if greater than zero, size of dashes of the wave (points)
+% thickness if greater than zero, thickness of wave (points)
+
+  /thickness exch def
+  /dash exch def
+  /step exch def
+  /ymax exch def
+  /xmax exch def
+  /ymin exch def
+  /xmin exch def
+  /base exch def
+  /wavelength exch def
+  /phase exch def
+  /amplitude exch def
+  % fun := amplitude*cos( ((-y-phase)/wavelength)*360) + base
+  /fun {phase sub wavelength div degpercycle mul cos
+           amplitude mul base add} def
+
+  gsave
+    /originallinewidth currentlinewidth def
+    thickness 0 gt {thickness setlinewidth} if
+    /c currentlinewidth def
+%   Make the curve fit into the region specified
+    newpath
+    xmin ymin c sub moveto
+    xmax ymin c sub lineto
+    xmax ymax c add lineto
+    xmin ymax c add lineto
+    closepath
+    clip
+
+    newpath
+    xmin dup fun moveto
+    xmin step xmax { % loop from xmin by step to xmax
+      dup fun lineto } for
+    dash 0 gt {[dash cvi] 0 setdash} if % turn dash on
+    stroke
+
+    originallinewidth setlinewidth
+  grestore
+} bind def
+
+/circlesymbol { % x y radius circlesymbol - (path)
+newpath 0 360 arc closepath} bind def
+
+/sqrt3 3 sqrt def
+/trianglesymbol { % x y radius trianglesymbol - (path)
+/r exch def
+/sqrt3r sqrt3 r mul def
+translate
+120 rotate
+0 r translate
+-120 rotate
+newpath
+0 0 moveto
+sqrt3r 0 lineto
+-300 rotate
+sqrt3r 0 lineto
+closepath} bind def
+
+/squaresymbol { % x y side squaresymbol - (path)
+/side exch def
+translate
+side 2 div neg dup translate
+newpath
+0 0 moveto
+0 side lineto
+side side lineto
+side 0 lineto
+closepath} bind def
+
+/linesymbol { % x1 y1 x2 y2 linesymbol - (path)
+/y2 exch def
+/x2 exch def
+/y1 exch def
+/x1 exch def
+newpath
+x1 y1 moveto
+x2 y2 lineto
+} bind def
+
+/boxsymbol { % x1 y1 x2 y2 boxsymbol - (path)
+/y2 exch def
+/x2 exch def
+/y1 exch def
+/x1 exch def
+newpath
+x1 y1 moveto
+x2 y1 lineto
+x2 y2 lineto
+x1 y2 lineto
+closepath
+} bind def
+
+% The following special comment allows deletion of the repeated
+% procedures when several logos are concatenated together
+% See the censor program.
+%]]%*)
+
+/startpage { % start a page
+  save % [ startpage
+  % set the font used in the title strings
+  FontForStringRegular
+  gsave % [ startpage
+  xcorner ycorner translate
+  rotation rotate
+  % create the user defined strings
+  % now move up to the top of the top line:
+  0 linesperpage linemove barheight mul mul translate
+
+  % set the font used in the logos
+  FontForLogo
+} def
+
+%(*[[ This special comment allows deletion of the repeated
+% procedures when several logos are concatenated together
+% See the censor program.
+
+/endpage { % end a page
+  grestore % ] endpage
+  showpage % REMOVE FOR PACKAGING INTO ANOTHER FIGURE
+  restore % ] endpage
+} def
+
+/showleftend {
+gsave
+ charwidth neg 0 translate
+ fivemovex fivemovey moveto ShowEnds (d) eq {(5) show prime} if
+ ShowEnds (p) eq {(N) show} if
+grestore
+} def
+
+/showrightend {
+gsave
+ threemovex threemovey moveto ShowEnds (d) eq {(3) show prime} if
+ ShowEnds (p) eq {(C) show} if
+grestore
+} def
+
+/startline{ % start a line
+% move down to the bottom of the line:
+  0 linemove barheight mul neg translate
+  
+  0 -15 translate
+
+  gsave % [ startline
+  barends {
+    maketic % maketic.startline
+    gsave
+      bar2n 0 translate % makebar.startline
+      makebar % makebar.startline
+    grestore
+  } if
+  showleftend
+} def
+
+/endline{ % end a line
+  showrightend
+  barends {
+    gsave
+      bar2 0 translate % makebar.endline
+      makebar % makebar.endline
+    grestore
+  } if
+  grestore % ] startline
+} def
+
+% @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+% @@@@@@@@@@@@@@@@@@@@ End of procedures @@@@@@@@@@@@@@@@@@@
+% @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+% The following special comment allows deletion of the repeated
+% procedures when several logos are concatenated together
+% See the censor program.
+%]]%*)
+
+%%EndProlog
+%%Page: 1 1
+startpage
+startline
+gsave
+0.20464 (A) numchar
+grestore
+shift
+gsave
+0.0261085 (C) numchar
+grestore
+shift
+gsave
+0.131178 (D) numchar
+grestore
+shift
+gsave
+0.163469 (E) numchar
+grestore
+shift
+gsave
+0.0387762 (F) numchar
+grestore
+shift
+gsave
+0.129116 (G) numchar
+grestore
+shift
+gsave
+0.129744 (H) numchar
+grestore
+shift
+gsave
+0.0900416 (I) numchar
+grestore
+shift
+gsave
+0.188063 (K) numchar
+grestore
+shift
+gsave
+0.148271 (L) numchar
+grestore
+shift
+gsave
+0.0384551 (M) numchar
+grestore
+shift
+gsave
+0.165668 (N) numchar
+grestore
+shift
+gsave
+0.0963763 (P) numchar
+grestore
+shift
+gsave
+0.174089 (Q) numchar
+grestore
+shift
+gsave
+0.185529 (R) numchar
+grestore
+shift
+gsave
+0.209334 (S) numchar
+grestore
+shift
+gsave
+0.184055 (T) numchar
+grestore
+shift
+gsave
+0.135202 (V) numchar
+grestore
+shift
+gsave
+0.0142996 (W) numchar
+grestore
+shift
+gsave
+0.0475839 (Y) numchar
+grestore
+shift
+endline
+0 0 0 setrgbcolor
+240 30 moveto
+(0.252565 ) show
+ 0 -80 translate
+startline
+gsave
+0.213635 (A) numchar
+grestore
+shift
+gsave
+0.00677925 (C) numchar
+grestore
+shift
+gsave
+0.384005 (D) numchar
+grestore
+shift
+gsave
+0.42168 (E) numchar
+grestore
+shift
+gsave
+0.0107916 (F) numchar
+grestore
+shift
+gsave
+0.132343 (G) numchar
+grestore
+shift
+gsave
+0.0778831 (H) numchar
+grestore
+shift
+gsave
+0.0204707 (I) numchar
+grestore
+shift
+gsave
+0.204403 (K) numchar
+grestore
+shift
+gsave
+0.0365244 (L) numchar
+grestore
+shift
+gsave
+0.0147298 (M) numchar
+grestore
+shift
+gsave
+0.230492 (N) numchar
+grestore
+shift
+gsave
+0.0413551 (P) numchar
+grestore
+shift
+gsave
+0.195388 (Q) numchar
+grestore
+shift
+gsave
+0.125548 (R) numchar
+grestore
+shift
+gsave
+0.186446 (S) numchar
+grestore
+shift
+gsave
+0.136722 (T) numchar
+grestore
+shift
+gsave
+0.041019 (V) numchar
+grestore
+shift
+gsave
+0.00406165 (W) numchar
+grestore
+shift
+gsave
+0.0157226 (Y) numchar
+grestore
+shift
+endline
+0 0 0 setrgbcolor
+240 30 moveto
+(0.120355 ) show
+ 0 -80 translate
+startline
+gsave
+0.585574 (A) numchar
+grestore
+shift
+gsave
+0.0375784 (C) numchar
+grestore
+shift
+gsave
+0.0738575 (D) numchar
+grestore
+shift
+gsave
+0.0995233 (E) numchar
+grestore
+shift
+gsave
+0.0195462 (F) numchar
+grestore
+shift
+gsave
+0.157428 (G) numchar
+grestore
+shift
+gsave
+0.0265605 (H) numchar
+grestore
+shift
+gsave
+0.0939759 (I) numchar
+grestore
+shift
+gsave
+0.0834166 (K) numchar
+grestore
+shift
+gsave
+0.0984722 (L) numchar
+grestore
+shift
+gsave
+0.0284305 (M) numchar
+grestore
+shift
+gsave
+0.0984743 (N) numchar
+grestore
+shift
+gsave
+0.090084 (P) numchar
+grestore
+shift
+gsave
+0.0854855 (Q) numchar
+grestore
+shift
+gsave
+0.0734144 (R) numchar
+grestore
+shift
+gsave
+0.357538 (S) numchar
+grestore
+shift
+gsave
+0.262582 (T) numchar
+grestore
+shift
+gsave
+0.204012 (V) numchar
+grestore
+shift
+gsave
+0.00647264 (W) numchar
+grestore
+shift
+gsave
+0.017573 (Y) numchar
+grestore
+shift
+endline
+0 0 0 setrgbcolor
+240 30 moveto
+(0.0858941 ) show
+ 0 -80 translate
+startline
+gsave
+0.135163 (A) numchar
+grestore
+shift
+gsave
+0.0180064 (C) numchar
+grestore
+shift
+gsave
+0.0203524 (D) numchar
+grestore
+shift
+gsave
+0.0336103 (E) numchar
+grestore
+shift
+gsave
+0.16424 (F) numchar
+grestore
+shift
+gsave
+0.0250805 (G) numchar
+grestore
+shift
+gsave
+0.0249643 (H) numchar
+grestore
+shift
+gsave
+0.378932 (I) numchar
+grestore
+shift
+gsave
+0.0388714 (K) numchar
+grestore
+shift
+gsave
+0.689261 (L) numchar
+grestore
+shift
+gsave
+0.200109 (M) numchar
+grestore
+shift
+gsave
+0.027768 (N) numchar
+grestore
+shift
+gsave
+0.0239892 (P) numchar
+grestore
+shift
+gsave
+0.0502755 (Q) numchar
+grestore
+shift
+gsave
+0.0413049 (R) numchar
+grestore
+shift
+gsave
+0.0773553 (S) numchar
+grestore
+shift
+gsave
+0.120791 (T) numchar
+grestore
+shift
+gsave
+0.353233 (V) numchar
+grestore
+shift
+gsave
+0.0132498 (W) numchar
+grestore
+shift
+gsave
+0.0634433 (Y) numchar
+grestore
+shift
+endline
+0 0 0 setrgbcolor
+240 30 moveto
+(0.0837002 ) show
+ 0 -80 translate
+startline
+gsave
+0.135059 (A) numchar
+grestore
+shift
+gsave
+0.0133755 (C) numchar
+grestore
+shift
+gsave
+0.00879957 (D) numchar
+grestore
+shift
+gsave
+0.0152507 (E) numchar
+grestore
+shift
+gsave
+0.0647772 (F) numchar
+grestore
+shift
+gsave
+0.0134173 (G) numchar
+grestore
+shift
+gsave
+0.00966115 (H) numchar
+grestore
+shift
+gsave
+0.698991 (I) numchar
+grestore
+shift
+gsave
+0.0156757 (K) numchar
+grestore
+shift
+gsave
+0.372756 (L) numchar
+grestore
+shift
+gsave
+0.110507 (M) numchar
+grestore
+shift
+gsave
+0.0128236 (N) numchar
+grestore
+shift
+gsave
+0.012321 (P) numchar
+grestore
+shift
+gsave
+0.0161942 (Q) numchar
+grestore
+shift
+gsave
+0.0153359 (R) numchar
+grestore
+shift
+gsave
+0.0470063 (S) numchar
+grestore
+shift
+gsave
+0.110478 (T) numchar
+grestore
+shift
+gsave
+0.809409 (V) numchar
+grestore
+shift
+gsave
+0.00460131 (W) numchar
+grestore
+shift
+gsave
+0.0135612 (Y) numchar
+grestore
+shift
+endline
+0 0 0 setrgbcolor
+240 30 moveto
+(0.0628216 ) show
+ 0 -80 translate
+startline
+gsave
+0.123293 (A) numchar
+grestore
+shift
+gsave
+0.00745654 (C) numchar
+grestore
+shift
+gsave
+0.0541786 (D) numchar
+grestore
+shift
+gsave
+0.136149 (E) numchar
+grestore
+shift
+gsave
+0.0101615 (F) numchar
+grestore
+shift
+gsave
+0.0587655 (G) numchar
+grestore
+shift
+gsave
+0.0847315 (H) numchar
+grestore
+shift
+gsave
+0.0236187 (I) numchar
+grestore
+shift
+gsave
+0.672917 (K) numchar
+grestore
+shift
+gsave
+0.075033 (L) numchar
+grestore
+shift
+gsave
+0.0189304 (M) numchar
+grestore
+shift
+gsave
+0.110377 (N) numchar
+grestore
+shift
+gsave
+0.0176363 (P) numchar
+grestore
+shift
+gsave
+0.217504 (Q) numchar
+grestore
+shift
+gsave
+0.614288 (R) numchar
+grestore
+shift
+gsave
+0.10765 (S) numchar
+grestore
+shift
+gsave
+0.107054 (T) numchar
+grestore
+shift
+gsave
+0.0424466 (V) numchar
+grestore
+shift
+gsave
+0.00428752 (W) numchar
+grestore
+shift
+gsave
+0.0135222 (Y) numchar
+grestore
+shift
+endline
+0 0 0 setrgbcolor
+240 30 moveto
+(0.0606297 ) show
+ 0 -80 translate
+endpage
+%%Page: 2 2
+startpage
+startline
+gsave
+0.092386 (A) numchar
+grestore
+shift
+gsave
+0.0191907 (C) numchar
+grestore
+shift
+gsave
+0.0249962 (D) numchar
+grestore
+shift
+gsave
+0.0303098 (E) numchar
+grestore
+shift
+gsave
+0.60173 (F) numchar
+grestore
+shift
+gsave
+0.0284894 (G) numchar
+grestore
+shift
+gsave
+0.143866 (H) numchar
+grestore
+shift
+gsave
+0.104564 (I) numchar
+grestore
+shift
+gsave
+0.0320205 (K) numchar
+grestore
+shift
+gsave
+0.235031 (L) numchar
+grestore
+shift
+gsave
+0.0494257 (M) numchar
+grestore
+shift
+gsave
+0.0434111 (N) numchar
+grestore
+shift
+gsave
+0.0208457 (P) numchar
+grestore
+shift
+gsave
+0.0402909 (Q) numchar
+grestore
+shift
+gsave
+0.0381179 (R) numchar
+grestore
+shift
+gsave
+0.0844088 (S) numchar
+grestore
+shift
+gsave
+0.0574471 (T) numchar
+grestore
+shift
+gsave
+0.107415 (V) numchar
+grestore
+shift
+gsave
+0.168844 (W) numchar
+grestore
+shift
+gsave
+0.57721 (Y) numchar
+grestore
+shift
+endline
+0 0 0 setrgbcolor
+240 30 moveto
+(0.0510766 ) show
+ 0 -80 translate
+startline
+gsave
+0.051892 (A) numchar
+grestore
+shift
+gsave
+0.00676664 (C) numchar
+grestore
+shift
+gsave
+0.00474832 (D) numchar
+grestore
+shift
+gsave
+0.0078379 (E) numchar
+grestore
+shift
+gsave
+0.139322 (F) numchar
+grestore
+shift
+gsave
+0.00651586 (G) numchar
+grestore
+shift
+gsave
+0.00671188 (H) numchar
+grestore
+shift
+gsave
+0.41836 (I) numchar
+grestore
+shift
+gsave
+0.00867519 (K) numchar
+grestore
+shift
+gsave
+1.2296 (L) numchar
+grestore
+shift
+gsave
+0.239486 (M) numchar
+grestore
+shift
+gsave
+0.00770095 (N) numchar
+grestore
+shift
+gsave
+0.0061405 (P) numchar
+grestore
+shift
+gsave
+0.013871 (Q) numchar
+grestore
+shift
+gsave
+0.00975898 (R) numchar
+grestore
+shift
+gsave
+0.0147539 (S) numchar
+grestore
+shift
+gsave
+0.0419415 (T) numchar
+grestore
+shift
+gsave
+0.262728 (V) numchar
+grestore
+shift
+gsave
+0.00474617 (W) numchar
+grestore
+shift
+gsave
+0.0184462 (Y) numchar
+grestore
+shift
+endline
+0 0 0 setrgbcolor
+240 30 moveto
+(0.0469074 ) show
+ 0 -80 translate
+startline
+gsave
+0.147436 (A) numchar
+grestore
+shift
+gsave
+0.00341048 (C) numchar
+grestore
+shift
+gsave
+0.790864 (D) numchar
+grestore
+shift
+gsave
+0.670553 (E) numchar
+grestore
+shift
+gsave
+0.00510643 (F) numchar
+grestore
+shift
+gsave
+0.0946212 (G) numchar
+grestore
+shift
+gsave
+0.0292924 (H) numchar
+grestore
+shift
+gsave
+0.00920363 (I) numchar
+grestore
+shift
+gsave
+0.106731 (K) numchar
+grestore
+shift
+gsave
+0.016565 (L) numchar
+grestore
+shift
+gsave
+0.00713546 (M) numchar
+grestore
+shift
+gsave
+0.199117 (N) numchar
+grestore
+shift
+gsave
+0.0239266 (P) numchar
+grestore
+shift
+gsave
+0.127637 (Q) numchar
+grestore
+shift
+gsave
+0.0472692 (R) numchar
+grestore
+shift
+gsave
+0.112757 (S) numchar
+grestore
+shift
+gsave
+0.078729 (T) numchar
+grestore
+shift
+gsave
+0.0205382 (V) numchar
+grestore
+shift
+gsave
+0.00204419 (W) numchar
+grestore
+shift
+gsave
+0.00706354 (Y) numchar
+grestore
+shift
+endline
+0 0 0 setrgbcolor
+240 30 moveto
+(0.0413108 ) show
+ 0 -80 translate
+startline
+gsave
+0.286553 (A) numchar
+grestore
+shift
+gsave
+0.0141053 (C) numchar
+grestore
+shift
+gsave
+0.155427 (D) numchar
+grestore
+shift
+gsave
+0.104087 (E) numchar
+grestore
+shift
+gsave
+0.0143818 (F) numchar
+grestore
+shift
+gsave
+1.00778 (G) numchar
+grestore
+shift
+gsave
+0.0330645 (H) numchar
+grestore
+shift
+gsave
+0.0186949 (I) numchar
+grestore
+shift
+gsave
+0.0943336 (K) numchar
+grestore
+shift
+gsave
+0.0307954 (L) numchar
+grestore
+shift
+gsave
+0.0147262 (M) numchar
+grestore
+shift
+gsave
+0.168337 (N) numchar
+grestore
+shift
+gsave
+0.0330333 (P) numchar
+grestore
+shift
+gsave
+0.0774239 (Q) numchar
+grestore
+shift
+gsave
+0.0821274 (R) numchar
+grestore
+shift
+gsave
+0.214131 (S) numchar
+grestore
+shift
+gsave
+0.0914567 (T) numchar
+grestore
+shift
+gsave
+0.0375628 (V) numchar
+grestore
+shift
+gsave
+0.00647908 (W) numchar
+grestore
+shift
+gsave
+0.0155044 (Y) numchar
+grestore
+shift
+endline
+0 0 0 setrgbcolor
+240 30 moveto
+(0.0372067 ) show
+ 0 -80 translate
+startline
+gsave
+0.0584467 (A) numchar
+grestore
+shift
+gsave
+0.00498924 (C) numchar
+grestore
+shift
+gsave
+0.00312627 (D) numchar
+grestore
+shift
+gsave
+0.00524165 (E) numchar
+grestore
+shift
+gsave
+0.0325561 (F) numchar
+grestore
+shift
+gsave
+0.0044083 (G) numchar
+grestore
+shift
+gsave
+0.00346741 (H) numchar
+grestore
+shift
+gsave
+0.981639 (I) numchar
+grestore
+shift
+gsave
+0.00536806 (K) numchar
+grestore
+shift
+gsave
+0.297698 (L) numchar
+grestore
+shift
+gsave
+0.0620069 (M) numchar
+grestore
+shift
+gsave
+0.00487212 (N) numchar
+grestore
+shift
+gsave
+0.00374493 (P) numchar
+grestore
+shift
+gsave
+0.00563035 (Q) numchar
+grestore
+shift
+gsave
+0.00528897 (R) numchar
+grestore
+shift
+gsave
+0.0098655 (S) numchar
+grestore
+shift
+gsave
+0.0464793 (T) numchar
+grestore
+shift
+gsave
+0.95898 (V) numchar
+grestore
+shift
+gsave
+0.00133904 (W) numchar
+grestore
+shift
+gsave
+0.00485186 (Y) numchar
+grestore
+shift
+endline
+0 0 0 setrgbcolor
+240 30 moveto
+(0.0355666 ) show
+ 0 -80 translate
+startline
+gsave
+0.312108 (A) numchar
+grestore
+shift
+gsave
+0.00820626 (C) numchar
+grestore
+shift
+gsave
+0.0882739 (D) numchar
+grestore
+shift
+gsave
+0.113184 (E) numchar
+grestore
+shift
+gsave
+0.0130428 (F) numchar
+grestore
+shift
+gsave
+0.0806258 (G) numchar
+grestore
+shift
+gsave
+0.0227121 (H) numchar
+grestore
+shift
+gsave
+0.025836 (I) numchar
+grestore
+shift
+gsave
+0.0916017 (K) numchar
+grestore
+shift
+gsave
+0.0721429 (L) numchar
+grestore
+shift
+gsave
+0.0148122 (M) numchar
+grestore
+shift
+gsave
+0.054464 (N) numchar
+grestore
+shift
+gsave
+1.04435 (P) numchar
+grestore
+shift
+gsave
+0.084304 (Q) numchar
+grestore
+shift
+gsave
+0.0736537 (R) numchar
+grestore
+shift
+gsave
+0.185245 (S) numchar
+grestore
+shift
+gsave
+0.114413 (T) numchar
+grestore
+shift
+gsave
+0.0838843 (V) numchar
+grestore
+shift
+gsave
+0.00510296 (W) numchar
+grestore
+shift
+gsave
+0.012039 (Y) numchar
+grestore
+shift
+endline
+0 0 0 setrgbcolor
+240 30 moveto
+(0.0300064 ) show
+ 0 -80 translate
+endpage
+%%Page: 3 3
+startpage
+startline
+gsave
+0.213933 (A) numchar
+grestore
+shift
+gsave
+0.0146706 (C) numchar
+grestore
+shift
+gsave
+0.0839624 (D) numchar
+grestore
+shift
+gsave
+0.0660644 (E) numchar
+grestore
+shift
+gsave
+0.0106842 (F) numchar
+grestore
+shift
+gsave
+0.0880119 (G) numchar
+grestore
+shift
+gsave
+0.0188904 (H) numchar
+grestore
+shift
+gsave
+0.0256653 (I) numchar
+grestore
+shift
+gsave
+0.0821934 (K) numchar
+grestore
+shift
+gsave
+0.0287162 (L) numchar
+grestore
+shift
+gsave
+0.0157834 (M) numchar
+grestore
+shift
+gsave
+0.160836 (N) numchar
+grestore
+shift
+gsave
+0.0264089 (P) numchar
+grestore
+shift
+gsave
+0.0591016 (Q) numchar
+grestore
+shift
+gsave
+0.0503811 (R) numchar
+grestore
+shift
+gsave
+0.729336 (S) numchar
+grestore
+shift
+gsave
+0.732963 (T) numchar
+grestore
+shift
+gsave
+0.0777031 (V) numchar
+grestore
+shift
+gsave
+0.00385244 (W) numchar
+grestore
+shift
+gsave
+0.0108429 (Y) numchar
+grestore
+shift
+endline
+0 0 0 setrgbcolor
+240 30 moveto
+(0.0264082 ) show
+ 0 -80 translate
+startline
+gsave
+1.2296 (A) numchar
+grestore
+shift
+gsave
+0.0566826 (C) numchar
+grestore
+shift
+gsave
+0.0174444 (D) numchar
+grestore
+shift
+gsave
+0.0329724 (E) numchar
+grestore
+shift
+gsave
+0.00755703 (F) numchar
+grestore
+shift
+gsave
+0.20524 (G) numchar
+grestore
+shift
+gsave
+0.00922357 (H) numchar
+grestore
+shift
+gsave
+0.018787 (I) numchar
+grestore
+shift
+gsave
+0.0165233 (K) numchar
+grestore
+shift
+gsave
+0.0308511 (L) numchar
+grestore
+shift
+gsave
+0.0111343 (M) numchar
+grestore
+shift
+gsave
+0.035421 (N) numchar
+grestore
+shift
+gsave
+0.0215348 (P) numchar
+grestore
+shift
+gsave
+0.0182497 (Q) numchar
+grestore
+shift
+gsave
+0.0155507 (R) numchar
+grestore
+shift
+gsave
+0.493903 (S) numchar
+grestore
+shift
+gsave
+0.161573 (T) numchar
+grestore
+shift
+gsave
+0.10884 (V) numchar
+grestore
+shift
+gsave
+0.0023494 (W) numchar
+grestore
+shift
+gsave
+0.00656178 (Y) numchar
+grestore
+shift
+endline
+0 0 0 setrgbcolor
+240 30 moveto
+(0.0237775 ) show
+ 0 -80 translate
+startline
+gsave
+0.0379557 (A) numchar
+grestore
+shift
+gsave
+0.00791322 (C) numchar
+grestore
+shift
+gsave
+0.00848936 (D) numchar
+grestore
+shift
+gsave
+0.0103779 (E) numchar
+grestore
+shift
+gsave
+0.920598 (F) numchar
+grestore
+shift
+gsave
+0.00940968 (G) numchar
+grestore
+shift
+gsave
+0.0886813 (H) numchar
+grestore
+shift
+gsave
+0.0445037 (I) numchar
+grestore
+shift
+gsave
+0.0112295 (K) numchar
+grestore
+shift
+gsave
+0.12917 (L) numchar
+grestore
+shift
+gsave
+0.025078 (M) numchar
+grestore
+shift
+gsave
+0.0168013 (N) numchar
+grestore
+shift
+gsave
+0.00615807 (P) numchar
+grestore
+shift
+gsave
+0.0140596 (Q) numchar
+grestore
+shift
+gsave
+0.0123652 (R) numchar
+grestore
+shift
+gsave
+0.0342021 (S) numchar
+grestore
+shift
+gsave
+0.0203916 (T) numchar
+grestore
+shift
+gsave
+0.0473136 (V) numchar
+grestore
+shift
+gsave
+0.0804648 (W) numchar
+grestore
+shift
+gsave
+0.974837 (Y) numchar
+grestore
+shift
+endline
+0 0 0 setrgbcolor
+240 30 moveto
+(0.023356 ) show
+ 0 -80 translate
+startline
+gsave
+0.181798 (A) numchar
+grestore
+shift
+gsave
+0.00558462 (C) numchar
+grestore
+shift
+gsave
+0.0565635 (D) numchar
+grestore
+shift
+gsave
+0.0361749 (E) numchar
+grestore
+shift
+gsave
+0.00515224 (F) numchar
+grestore
+shift
+gsave
+1.87804 (G) numchar
+grestore
+shift
+gsave
+0.00983568 (H) numchar
+grestore
+shift
+gsave
+0.00751154 (I) numchar
+grestore
+shift
+gsave
+0.0323179 (K) numchar
+grestore
+shift
+gsave
+0.0114651 (L) numchar
+grestore
+shift
+gsave
+0.00609579 (M) numchar
+grestore
+shift
+gsave
+0.0602005 (N) numchar
+grestore
+shift
+gsave
+0.0101046 (P) numchar
+grestore
+shift
+gsave
+0.0235193 (Q) numchar
+grestore
+shift
+gsave
+0.0270369 (R) numchar
+grestore
+shift
+gsave
+0.0904069 (S) numchar
+grestore
+shift
+gsave
+0.0330959 (T) numchar
+grestore
+shift
+gsave
+0.0175588 (V) numchar
+grestore
+shift
+gsave
+0.00228745 (W) numchar
+grestore
+shift
+gsave
+0.00525485 (Y) numchar
+grestore
+shift
+endline
+0 0 0 setrgbcolor
+240 30 moveto
+(0.0184185 ) show
+endline
+endpage
+%%Trailer
+%%Pages: 3
