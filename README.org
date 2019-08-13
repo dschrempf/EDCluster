@@ -48,15 +48,14 @@ RevBayes [fn:9].
 
 #+RESULTS: Help
 #+begin_example
-usage: cluster-site-distributions [-h] [--transformation {none,clr,lclr}]
-                                  [-k K] [-p PREFIX]
-                                  filenames [filenames ...]
+usage: edm-cluster [-h] [--transformation {none,clr,lclr}] [-k K] [-p PREFIX]
+                   filenames [filenames ...]
 
-Cluster site distributions. Each amino acid frequency distribution
-distribution is considered as a point in twenty dimensional space. The K-Means
-clustering algorithm is used to label the points from 1 to K, with different
-values of K. The clusters are output in various file formats, readily usable
-with IQ-TREE [1], Phylobayes [2], and RevBayes [3].
+Transform and cluster site distributions. Each amino acid frequency
+distribution distribution is considered as a point in twenty dimensional space.
+The K-Means clustering algorithm is used to label the points from 1 to K, with
+different values of K. The clusters are output in various file formats, readily
+usable with IQ-TREE [1], Phylobayes [2], and RevBayes [3].
 
 Before clustering, coordinate transformations can be applied.
 
