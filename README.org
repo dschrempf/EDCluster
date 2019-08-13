@@ -15,29 +15,27 @@ acids at a specific site in the alignment. Consequently, site distributionare
 are points in 20-dimensional space with elements summing up to 1.0.
 
 Site distributions can be calculated during Bayesian analysis, for example with
-Phylobayes and the CAT model [fn:1] . In this case, a site distribution
-corresponds to the expectation of the posterior distribution of the stationary
-distribution of amino acids at a specific site.
+Phylobayes and the CAT model [1] . In this case, a site distribution corresponds
+to the expectation of the posterior distribution of the stationary distribution
+of amino acids at a specific site.
 
 The script presented here can transform the site distributions before further
 analysis. Application of linear transformations is a standard procedure in
 analyses of compositional data. The two provided transformations are: (1) the
-centered log ratio transformation (CLR, [fn:2]), and (2) the log centered log
-ratio transformation (LCLR, [fn:3]). The transformations ensure that site
-distributions exhibiting specific different features are moved further apart
-from each other, so that they fall into different groups in the subsequent
-analysis.
+centered log ratio transformation (CLR, [2]), and (2) the log centered log ratio
+transformation (LCLR, [3]). The transformations ensure that site distributions
+exhibiting specific different features are moved further apart from each other,
+so that they fall into different groups in the subsequent analysis.
 
-K-means clustering with Scikit-Learn [fn:4] is used to group the prepared site
+K-means clustering with Scikit-Learn [4] is used to group the prepared site
 distributions into 4, 8, 16, 32, 64, 128, and 256 clusters. The cluster centers,
 which are the stationary distributions, and weights can be used as components of
 EDM models.
 
 Further, a set of stationary distributions and weights estimated from sub-sets
-of the HOGENOM [fn:5] and HSSP [fn:6] data bases, as well as a union of both are
+of the HOGENOM [5] and HSSP [6] data bases, as well as a union of both are
 provided. The files can directly be used with several established phylogenetic
-softwware packages such as IQ-TREE [fn:7], Phylobayes [fn:8], or
-RevBayes [fn:9].
+softwware packages such as IQ-TREE [7], Phylobayes [8], or RevBayes [9].
 
 # TODO: Provide command lines for the three software packages.
 
@@ -118,43 +116,42 @@ gene expression and bicycle sharing system data. ArXiv, 1–32.
 
 * Footnotes
 
-[fn:4] Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B.,
-Grisel, O., Blondel, M., …, Scikit-learn: machine learning in Python, Journal of
-Machine Learning Research, 12(), 2825–2830 (2011).
+[4] Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel,
+O., Blondel, M., …, Scikit-learn: machine learning in Python, Journal of Machine
+Learning Research, 12(), 2825–2830 (2011).
 
-[fn:9] Höhna, S., Landis, M. J., Heath, T. A., Boussau, B., Lartillot, N.,
-Moore, B. R., Huelsenbeck, J. P., …, Revbayes: bayesian phylogenetic inference
-using graphical models and an interactive model-specification language,
-Systematic Biology, 65(4), 726–736 (2016).
-http://dx.doi.org/10.1093/sysbio/syw021
+[9] Höhna, S., Landis, M. J., Heath, T. A., Boussau, B., Lartillot, N., Moore,
+B. R., Huelsenbeck, J. P., …, Revbayes: bayesian phylogenetic inference using
+graphical models and an interactive model-specification language, Systematic
+Biology, 65(4), 726–736 (2016). http://dx.doi.org/10.1093/sysbio/syw021
 
-[fn:8] Lartillot, N., Rodrigue, N., Stubbs, D., & Richer, J., Phylobayes mpi:
+[8] Lartillot, N., Rodrigue, N., Stubbs, D., & Richer, J., Phylobayes mpi:
 phylogenetic reconstruction with infinite mixtures of profiles in a parallel
 environment, Systematic Biology, 62(4), 611–615 (2013).
 http://dx.doi.org/10.1093/sysbio/syt022
 
-[fn:7] Nguyen, L., Schmidt, H. A., von Haeseler, A., & Minh, B. Q., Iq-tree: a
-fast and effective stochastic algorithm for estimating maximum-likelihood
+[7] Nguyen, L., Schmidt, H. A., von Haeseler, A., & Minh, B. Q., Iq-tree: a fast
+and effective stochastic algorithm for estimating maximum-likelihood
 phylogenies, Molecular Biology and Evolution, 32(1), 268–274 (2015).
 http://dx.doi.org/10.1093/molbev/msu300
 
-[fn:6] Schneider, R., Daruvar, A. d., & Sander, C., The HSSP database of protein
+[6] Schneider, R., Daruvar, A. d., & Sander, C., The HSSP database of protein
 structure-sequence alignments, Nucleic Acids Research, 25(1), 226–230 (1997).
 http://dx.doi.org/10.1093/nar/25.1.226
 
-[fn:5] Dufayard, J., Duret, L., Penel, S., Gouy, M., Rechenmann, F., & Perrière,
+[5] Dufayard, J., Duret, L., Penel, S., Gouy, M., Rechenmann, F., & Perrière,
 G., Tree pattern matching in phylogenetic trees: automatic search for orthologs
 or paralogs in homologous gene sequence databases, Bioinformatics, 21(11),
 2596–2603 (2005). http://dx.doi.org/10.1093/bioinformatics/bti325
 
-[fn:3] Godichon-Baggioni, A., Maugis-Rabusseau, C., & Rau, A., Clustering
+[3] Godichon-Baggioni, A., Maugis-Rabusseau, C., & Rau, A., Clustering
 transformed compositional data using k-means, with applications in gene
 expression and bicycle sharing system data, Journal of Applied Statistics,
 46(1), 47–65 (2018). http://dx.doi.org/10.1080/02664763.2018.1454894
 
-[fn:2] Aitchison, J., The statistical analysis of compositional data, Journal of
+[2] Aitchison, J., The statistical analysis of compositional data, Journal of
 the Royal Statistical Society, Series B (Methological), 44(2), 139–177 (1982).
 
-[fn:1] Lartillot, N., & Philippe, H., A bayesian mixture model for across-site
+[1] Lartillot, N., & Philippe, H., A bayesian mixture model for across-site
 heterogeneities in the amino-acid replacement process, Molecular Biology and
 Evolution, 21(6), 1095–1109 (2004). http://dx.doi.org/10.1093/molbev/msh112
