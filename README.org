@@ -1,10 +1,49 @@
-* Empirical distribution mixutre models
+* Empirical distribution mixture models
 
 # TODO: Add citation.
 
+# For your reference, please see and cite CITATION.
+
+Empirical distribution mixture (EDM) models assume that evolution occurs along a
+species tree according to a mixture of amino acid substitution models. The
+transition rate matrices of the different components share one set of
+exchangeabilities. In contrast, the stationary distributions differ between each
+component of the mixture model. The Python script presented here obtains
+stationary distributions with corresponding weights from a set of site
+distributions. A site distribution is the probability distribution of used amino
+acids at a specific site in the alignment. Consequently, site distributionare
+are points in 20-dimensional space with elements summing up to 1.0.
+
+Site distributions can be calculated during Bayesian analysis, for example with
+Phylobayes and the CAT model [fn:1] . In this case, a site distribution
+corresponds to the expectation of the posterior distribution of the stationary
+distribution of amino acids at a specific site.
+
+The script presented here can transform the site distributions before further
+analysis. Application of linear transformations is a standard procedure in
+analyses of compositional data. The two provided transformations are: (1) the
+centered log ratio transformation (CLR, [fn:2]), and (2) the log centered log
+ratio transformation (LCLR, [fn:3]). The transformations ensure that site
+distributions exhibiting specific different features are moved further apart
+from each other, so that they fall into different groups in the subsequent
+analysis.
+
+K-means clustering with Scikit-Learn [fn:4] is used to group the prepared site
+distributions into 4, 8, 16, 32, 64, 128, and 256 clusters. The cluster centers,
+which are the stationary distributions, and weights can be used as components of
+EDM models.
+
+Further, a set of stationary distributions and weights estimated from sub-sets
+of the HOGENOM [fn:5] and HSSP [fn:6] data bases, as well as a union of both are
+provided. The files can directly be used with several established phylogenetic
+softwware packages such as IQ-TREE [fn:7], Phylobayes [fn:8], or
+RevBayes [fn:9].
+
+# TODO: Provide command lines for the three software packages.
+
 #+NAME: Help
 #+BEGIN_SRC sh :exports results :results output verbatim
-./cluster-site-distributions --help
+./edm-cluster --help
 #+END_SRC
 
 #+RESULTS: Help
@@ -77,3 +116,23 @@ Journal of the Royal Statistical Society, Series B (Methological), 44(2),
 Clustering transformed compositional data using K-means, with applications in
 gene expression and bicycle sharing system data. ArXiv, 1–32.
 #+end_example
+
+* Footnotes
+
+[fn:4] autocite:Pedregosa2011
+
+[fn:9] autocite:Hohna2016
+
+[fn:8] autocite:Lartillot2013
+
+[fn:7] autocite:Nguyen2015
+
+[fn:6] autocite:Schneider1997
+
+[fn:5] autocite:Dufayard2005
+
+[fn:3] autocite:Godichon-Baggioni2018
+
+[fn:2] autocite:Aitchison1982
+
+[fn:1] autocite:Lartillot2004
