@@ -4,15 +4,17 @@
 
 # For your reference, please see and cite CITATION.
 
-Empirical distribution mixture (EDM) models assume that evolution occurs along a
+Empirical distribution mixture models assume that evolution occurs along a
 species tree according to a mixture of amino acid substitution models. The
 transition rate matrices of the different components share one set of
 exchangeabilities. In contrast, the stationary distributions differ between each
-component of the mixture model. The Python script presented here obtains
-stationary distributions with corresponding weights from a set of site
-distributions. A site distribution is the probability distribution of used amino
-acids at a specific site in the alignment. Consequently, site distributionare
-are points in 20-dimensional space with elements summing up to 1.0.
+component of the mixture model.
+
+Here, we present *EDCluster*, a Python script obtaining empirical stationary
+distributions with corresponding weights from a set of site distributions. A
+site distribution is the probability distribution of used amino acids at a
+specific site in the alignment. Consequently, site distributions are are points
+in 20-dimensional space with elements summing up to 1.0.
 
 Site distributions can be calculated during Bayesian analysis, for example with
 Phylobayes and the CAT model [1] . In this case, a site distribution corresponds
@@ -32,28 +34,31 @@ distributions into 4, 8, 16, 32, 64, 128, and 256 clusters. The cluster centers,
 which are the stationary distributions, and weights can be used as components of
 EDM models.
 
-Further, a set of stationary distributions and weights estimated from sub-sets
-of the HOGENOM [5] and HSSP [6] data bases, as well as a union of both are
-provided. The files can directly be used with several established phylogenetic
-softwware packages such as IQ-TREE [7], Phylobayes [8], or RevBayes [9].
+Further, sets of stationary distributions and weights estimated from subsets of
+the HOGENOM [5] and HSSP [6] data bases, as well as a union of both are
+provided. Empirical distribution mixture models resulting from these sets have
+been termed *UDM models*. The files can directly be used with several
+established phylogenetic softwware packages such as IQ-TREE [7], Phylobayes [8],
+or RevBayes [9].
 
 # TODO: Provide command lines for the three software packages.
 
 #+NAME: Help
 #+BEGIN_SRC sh :exports results :results output verbatim
-./edm-cluster --help
+./EDCluster --help
 #+END_SRC
 
 #+RESULTS: Help
 #+begin_example
-usage: edm-cluster [-h] [--transformation {none,clr,lclr}] [-k K] [-p PREFIX]
-                   filenames [filenames ...]
+usage: EDCluster [-h] [--transformation {none,clr,lclr}] [-k K] [-p PREFIX]
+                 filenames [filenames ...]
 
-Transform and cluster site distributions. Each amino acid frequency
-distribution distribution is considered as a point in twenty dimensional space.
-The K-Means clustering algorithm is used to label the points from 1 to K, with
-different values of K. The clusters are output in various file formats, readily
-usable with IQ-TREE [1], Phylobayes [2], and RevBayes [3].
+EDCluster: Transform and cluster site distributions. Each amino acid
+frequency distribution distribution is considered as a point in twenty
+dimensional space. The K-Means clustering algorithm is used to label the points
+from 1 to K, with different values of K. The clusters are output in various
+file formats, readily usable with IQ-TREE [1], Phylobayes [2], and RevBayes
+[3].
 
 Before clustering, coordinate transformations can be applied.
 
@@ -70,10 +75,10 @@ The site distribution files are expected to be tab separated, and of the
 following form:
 
 ----------------------------------------------------------------------
-A C D E F G H I K L M N P Q R S T V W Y
+  A C D E F G H I K L M N P Q R S T V W Y
 
-1	0.008	0.001	0.001	0.007	0.002	0.004	0.01	0.006	0.14	0.006	0.005	0.009	0.002	0.01	0.7	0.009	0.01	0.006	0.002	0.003
-2	...
+1 0.008 0.001 0.001 0.007 0.002 0.004 0.01 ...
+2 ...
 ...
 ----------------------------------------------------------------------
 
