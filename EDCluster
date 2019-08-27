@@ -11,15 +11,17 @@ import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
 
-citation = """Empirical distribution mixture models. Developed by Dominik Schrempf (2019).
-"""
+version = "1.0"
 
-desc = """EDCluster: Transform and cluster site distributions. Each amino acid
-frequency distribution distribution is considered as a point in twenty
-dimensional space. The K-Means clustering algorithm is used to label the points
-from 1 to K, with different values of K. The clusters are output in various
-file formats, readily usable with IQ-TREE [1], Phylobayes [2], and RevBayes
-[3].
+citation = "EDCluster version " + version + ".\n" + \
+    "Developed by Dominik Schrempf (2019). "
+
+desc = """Scalable detection of empirical distribution mixture models by
+transformation and clustering of site distributions. Each amino acid frequency
+distribution distribution is considered as a point in twenty dimensional space.
+The K-Means clustering algorithm is used to label the points from 1 to K, with
+different values of K. The clusters are output in various file formats, readily
+usable with IQ-TREE [1], Phylobayes [2], and RevBayes [3].
 
 Before clustering, coordinate transformations can be applied.
 
@@ -42,9 +44,8 @@ following form:
 2 ...
 ...
 ----------------------------------------------------------------------
-
 """
-desc += citation
+desc = citation + "\n\n" + desc
 
 epilog = """
 
@@ -93,6 +94,8 @@ def parse_arguments():
                         help="Number of clusters (default: %(default)s)")
     parser.add_argument('-p', "--prefix", help="Prefix of output files.",
                         default=None)
+    parser.add_argument('--version', action='version',
+                        version="%(prog)s version " + version)
     return parser.parse_args()
 
 
