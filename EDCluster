@@ -11,17 +11,17 @@ import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
 
-version = "1.0"
+version = "1.0.1"
 
 citation = "EDCluster version " + version + ".\n" + \
     "Developed by Dominik Schrempf (2019). "
 
 desc = """Scalable detection of empirical distribution mixture models by
 transformation and clustering of site distributions. Each amino acid frequency
-distribution distribution is considered as a point in twenty dimensional space.
-The K-Means clustering algorithm is used to label the points from 1 to K, with
-different values of K. The clusters are output in various file formats, readily
-usable with IQ-TREE [1], Phylobayes [2], and RevBayes [3].
+distribution is considered as a point in twenty dimensional space. The K-Means
+clustering algorithm is used to label the points from 1 to K, for a given value
+of K. The clusters are output in various file formats, readily usable with
+IQ-TREE [1], Phylobayes [2], and RevBayes [3].
 
 Before clustering, coordinate transformations can be applied.
 
@@ -29,10 +29,10 @@ Implemented transformations:
 - centered log ratio (CLR) transform [4]
 - log centered log ratio (LCLR) transform [5]
 
-Basically, points close to the boundaries, that is, where some coordinates have
-very low probability, will be projected to a position that is very far away
-from points that have high diversity and intermediate frequency values for all
-coordinates.
+Basically, points close to the boundaries exhibiting specific features, that
+is, where some coordinates have very low probability, will be projected to a
+position that is very far away from points that have high diversity and
+intermediate frequency values for all coordinates.
 
 The site distribution files are expected to be tab separated, and of the
 following form:

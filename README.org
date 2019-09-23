@@ -7,14 +7,13 @@
 Empirical distribution mixture models assume that evolution occurs along a
 species tree according to a mixture of amino acid substitution models. The
 transition rate matrices of the different components share one set of
-exchangeabilities. In contrast, the stationary distributions differ between each
-component of the mixture model.
+exchangeabilities but differ in their stationary distributions.
 
-Here, we present *EDCluster*, a Python script obtaining empirical stationary
-distributions with corresponding weights from a set of site distributions. A
-site distribution is the probability distribution of used amino acids at a
-specific site in the alignment. Consequently, site distributions are are points
-in 20-dimensional space with elements summing up to 1.0.
+*EDCluster* is a Python script obtaining empirical stationary distributions with
+corresponding weights from a set of site distributions. A site distribution is
+the probability distribution of used amino acids at a specific site in the
+alignment. Consequently, site distributions are are points in 20-dimensional
+space with elements summing up to 1.0.
 
 Site distributions can be calculated during Bayesian analysis, for example with
 Phylobayes and the CAT model [1] . In this case, a site distribution corresponds
@@ -51,14 +50,18 @@ or RevBayes [9].
 #+RESULTS: Help
 #+begin_example
 usage: EDCluster [-h] [--transformation {none,clr,lclr}] [-k K] [-p PREFIX]
+                 [--version]
                  filenames [filenames ...]
 
-EDCluster: Transform and cluster site distributions. Each amino acid
-frequency distribution distribution is considered as a point in twenty
-dimensional space. The K-Means clustering algorithm is used to label the points
-from 1 to K, with different values of K. The clusters are output in various
-file formats, readily usable with IQ-TREE [1], Phylobayes [2], and RevBayes
-[3].
+EDCluster version 1.0.1.
+Developed by Dominik Schrempf (2019). 
+
+Scalable detection of empirical distribution mixture models by
+transformation and clustering of site distributions. Each amino acid frequency
+distribution is considered as a point in twenty dimensional space. The K-Means
+clustering algorithm is used to label the points from 1 to K, for a given value
+of K. The clusters are output in various file formats, readily usable with
+IQ-TREE [1], Phylobayes [2], and RevBayes [3].
 
 Before clustering, coordinate transformations can be applied.
 
@@ -66,10 +69,10 @@ Implemented transformations:
 - centered log ratio (CLR) transform [4]
 - log centered log ratio (LCLR) transform [5]
 
-Basically, points close to the boundaries, that is, where some coordinates have
-very low probability, will be projected to a position that is very far away
-from points that have high diversity and intermediate frequency values for all
-coordinates.
+Basically, points close to the boundaries exhibiting specific features, that
+is, where some coordinates have very low probability, will be projected to a
+position that is very far away from points that have high diversity and
+intermediate frequency values for all coordinates.
 
 The site distribution files are expected to be tab separated, and of the
 following form:
@@ -82,8 +85,6 @@ following form:
 ...
 ----------------------------------------------------------------------
 
-Empirical distribution mixture models. Developed by Dominik Schrempf (2019).
-
 positional arguments:
   filenames             Names of files containing site distributions
 
@@ -94,6 +95,7 @@ optional arguments:
   -k K                  Number of clusters (default: 64)
   -p PREFIX, --prefix PREFIX
                         Prefix of output files. (default: None)
+  --version             show program's version number and exit
 
 [1] Nguyen, L., Schmidt, H. A., von Haeseler, A., & Minh, B. Q. (2015).
 Iq-tree: a fast and effective stochastic algorithm for estimating
