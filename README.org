@@ -1,8 +1,6 @@
 * Empirical distribution mixture models
 
-# TODO: Add citation.
-
-# For your reference, please see and cite CITATION.
+For your reference, please see and cite the [[https://www.biorxiv.org/content/10.1101/794263v1][preprint uploaded to bioRxiv.]]
 
 Empirical distribution mixture models assume that evolution occurs along a
 species tree according to a mixture of amino acid substitution models. The
