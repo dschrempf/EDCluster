@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC2129
+
+echo "Combine all \*.nex files into one file to be used with IQ-TREE."
+
+set -e
+
+tmp=$(mktemp)
+
+
+for f in *.nex
+do
+    cat "$f" >> "$tmp"
+    echo "">> "$tmp"
+done
+
+fn=edm_models.nex
+
+if [[ -e $fn ]]
+then
+    echo "ERROR: Output file $fn exists. Abort."
+    exit 1
+fi
+
+echo "#nexus" > $fn
+echo "begin models;" >> $fn
+grep -v -e "^#nexus" "$tmp" | grep -v -e "^begin models;" | grep -v -e "^end;" >> $fn
+echo "end;" >> $fn
