@@ -178,7 +178,7 @@ data_array = list(map(read_site_distribution_pd, fns))
 data_conc = pd.concat(data_array, ignore_index=True)
 data = data_conc
 print("Done.")
-print(len(data), "site distributions read.")
+print(len(data), "site distributions.")
 print("")
 
 
@@ -275,19 +275,18 @@ print("")
 # Transform data.
 data_t = {}
 if "none" in ts:
-    data_t["none"] = data
-
+    data_t["none"] = data.copy()
     ts.remove("none")
 if ts != ["none"]:
     print("Transforming data.")
 if "clr" in ts:
-    data_t["clr"] = clr_df(data)
+    data_t["clr"] = clr_df(data.copy())
     # print("First rows of CLR transformed data:")
     # print(data_t["clr"].head())
     # print("")
     ts.remove("clr")
 if "lclr" in ts:
-    data_t["lclr"] = lclr_df(data)
+    data_t["lclr"] = lclr_df(data.copy())
     # print("First rows of LCLR transformed data:")
     # print(data_t["lclr"].head())
     # print("")
@@ -319,17 +318,24 @@ print("Clustering.")
 print("     K     T")
 for k in ks:
     for t in data_t.keys():
-        data = data_t[t]
+        data = data_t[t].copy()
         idx = pd.Index([i for i in range(k)], name=["Cluster index"])
 
         cls = pd.Index(["Weight", "Center"])
         clusters_all_lclr = pd.DataFrame([], index=idx, columns=cls)
 
         print(str(k).rjust(6), t.rjust(6), sep='')
-        kwds = {'n_clusters': k, 'n_jobs': -1}
+        kwds = {'n_clusters': k, 'n_jobs': -1, 'max_iter': 500, 'tol': 5e-5}
         labels, clusters_raw = cluster(data, KMeans, kwds=kwds)
         clusters = pd.DataFrame(clusters_raw)
-        clusters_freq = clusters.apply(lclr_inv, axis=1)
+        if t == "lclr":
+            clusters_freq = clusters.apply(lclr_inv, axis=1)
+        elif t == "clr":
+            clusters_freq = clusters.apply(clr_inv, axis=1)
+        elif t == "none":
+            clusters_freq = clusters
+        else:
+            raise ValueError("Unknown transformation:", t)
         clusters_labels = labels
         clusters_freq = clusters_freq.values.tolist()
         weights = get_weights(clusters_labels)
