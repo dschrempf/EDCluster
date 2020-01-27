@@ -47,12 +47,11 @@ or RevBayes [9].
 
 #+RESULTS: Help
 #+begin_example
-usage: EDCluster [-h] [--transformation {none,clr,lclr}] [-k K] [-p PREFIX]
-                 [--version]
+usage: EDCluster [-h] [-t {none,clr,lclr}] [-k K] [-p P] [-v]
                  filenames [filenames ...]
 
-EDCluster version 1.0.1.
-Developed by Dominik Schrempf (2019). 
+EDCluster version 2.0.0.
+Developed by Dominik Schrempf (2020). 
 
 Scalable detection of empirical distribution mixture models by
 transformation and clustering of site distributions. Each amino acid frequency
@@ -67,10 +66,10 @@ Implemented transformations:
 - centered log ratio (CLR) transform [4]
 - log centered log ratio (LCLR) transform [5]
 
-Basically, points close to the boundaries exhibiting specific features, that
-is, where some coordinates have very low probability, will be projected to a
-position that is very far away from points that have high diversity and
-intermediate frequency values for all coordinates.
+Points close to the boundaries, that is, with some coordinates having low
+probability, exhibit special features. The coordinate transformations project
+these points to a position far away from the projection of points with high
+diversity and intermediate frequency values for all coordinates.
 
 The site distribution files are expected to be tab separated, and of the
 following form:
@@ -83,17 +82,21 @@ following form:
 ...
 ----------------------------------------------------------------------
 
+By default, EDcluster calculates mixture model components of empirical
+distribution mixture (EDM) models for K={4,8,16,32,64,128,256,512,1024,2048},
+and all coordinate transformations. This can take a while. Calculation of an
+EDM model with a specific number of components, as well as a specific
+transformation can be achieved with the -k, and -t options (see below). 
+
 positional arguments:
-  filenames             Names of files containing site distributions
+  filenames           Names of files containing site distributions
 
 optional arguments:
-  -h, --help            show this help message and exit
-  --transformation {none,clr,lclr}, -t {none,clr,lclr}
-                        Transformation (default: None)
-  -k K                  Number of clusters (default: 64)
-  -p PREFIX, --prefix PREFIX
-                        Prefix of output files. (default: None)
-  --version             show program's version number and exit
+  -h, --help          show this help message and exit
+  -t {none,clr,lclr}  Use specific transformation. (default: None)
+  -k K                Use specific number of clusters. (default: None)
+  -p P                Prefix of output files. (default: None)
+  -v                  show program's version number and exit
 
 [1] Nguyen, L., Schmidt, H. A., von Haeseler, A., & Minh, B. Q. (2015).
 Iq-tree: a fast and effective stochastic algorithm for estimating
