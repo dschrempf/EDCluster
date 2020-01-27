@@ -338,7 +338,7 @@ for k in ks:
             fbn = prefix + "_"
         else:
             fbn = ""
-        fbn += "EDM_" + str(k).zfill(4) + "_" + t
+        fbn += "edm_" + str(k).zfill(4) + "_" + t
 
         clusters_df_unsorted = pd.DataFrame({"Weight": weights,
                                              "Center": clusters_freq})
@@ -435,7 +435,7 @@ if prefix is not None:
     fbn = prefix + "_"
 else:
     fbn = ""
-fbn += "EDM_XXXX_TRNS_EXTENSION"
+fbn += "edm_XXXX_TRNS_EXTENSION"
 print("Output written to files of the following form:", fbn)
 expl = """where TRNS is the transformation, XXXX is the number of clusters, and EXT is
 an extension which depends on the software package. """
