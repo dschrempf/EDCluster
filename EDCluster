@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import argparse
-# import subprocess
+import subprocess
 from functools import reduce
-# import os
+import os
 
 from math import exp
 from math import log
@@ -11,10 +11,10 @@ import numpy as np
 import pandas as pd
 from sklearn.cluster import KMeans
 
-version = "1.0.1"
+version = "2.0.0"
 
 citation = "EDCluster version " + version + ".\n" + \
-    "Developed by Dominik Schrempf (2019). "
+    "Developed by Dominik Schrempf (2020). "
 
 desc = """Scalable detection of empirical distribution mixture models by
 transformation and clustering of site distributions. Each amino acid frequency
@@ -29,10 +29,10 @@ Implemented transformations:
 - centered log ratio (CLR) transform [4]
 - log centered log ratio (LCLR) transform [5]
 
-Basically, points close to the boundaries exhibiting specific features, that
-is, where some coordinates have very low probability, will be projected to a
-position that is very far away from points that have high diversity and
-intermediate frequency values for all coordinates.
+Points close to the boundaries, that is, with some coordinates having low
+probability, exhibit special features. The coordinate transformations project
+these points to a position far away from the projection of points with high
+diversity and intermediate frequency values for all coordinates.
 
 The site distribution files are expected to be tab separated, and of the
 following form:
@@ -44,8 +44,17 @@ following form:
 2 ...
 ...
 ----------------------------------------------------------------------
+
 """
-desc = citation + "\n\n" + desc
+
+usage = """By default, EDcluster calculates mixture model components of empirical
+distribution mixture (EDM) models for K={4,8,16,32,64,128,256,512,1024,2048},
+and all coordinate transformations. This can take a while. Calculation of an
+EDM model with a specific number of components, as well as a specific
+transformation can be achieved with the -k, and -t options (see below). """
+
+
+desc = citation + "\n\n" + desc + "\n\n" + usage
 
 epilog = """
 
@@ -87,29 +96,58 @@ def parse_arguments():
         epilog=epilog)
     parser.add_argument("filenames", nargs='+',
                         help="Names of files containing site distributions")
-    parser.add_argument("--transformation", "-t", default="None",
+    parser.add_argument("-t",
                         choices=["none", "clr", "lclr"],
-                        help="Transformation (default: %(default)s)")
-    parser.add_argument("-k", default=64, type=int,
-                        help="Number of clusters (default: %(default)s)")
-    parser.add_argument('-p', "--prefix", help="Prefix of output files.",
+                        help="Use specific transformation.")
+    parser.add_argument("-k", type=int,
+                        help="Use specific number of clusters.")
+    parser.add_argument('-p', help="Prefix of output files.",
                         default=None)
-    parser.add_argument('--version', action='version',
+    parser.add_argument('-v', action='version',
                         version="%(prog)s version " + version)
     return parser.parse_args()
 
 
 args = parse_arguments()
 fns = args.filenames
-transformation = args.transformation
+
+# By default, use all combinations.
+t = args.t
+if t is None:
+    ts = ["none", "clr", "lclr"]
+else:
+    ts = [t]
+
 k = args.k
-prefix = args.prefix
+if k is None:
+    ks = [4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048]
+else:
+    if k > 9999:
+        raise ValueError("It is not advised to use so many components. Abort.")
+    if k < 2:
+        raise ValueError("K has to be larger than 1. Abort.")
+    ks = [k]
+prefix = args.p
 
 # Definitions.
 amino_acids = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P",
                "Q", "R", "S", "T", "V", "W", "Y"]
 n_aa = 20
-# create_nicologos = True
+create_nicologos = False
+if create_nicologos:
+    if not os.path.isfile("modeheader"):
+        print("WARNING: File 'modeheader' is missing, " +
+              "Nicologo can not be created.")
+        create_nicologos = False
+    elif not os.path.isfile("seqheader"):
+        print("WARNING: File 'seqheader' is missing, " +
+              "Nicologo can not be created.")
+        create_nicologos = False
+    elif not os.path.isfile("prologo"):
+        print("WARNING: Executable 'prologo' is missing, " +
+              "Nicologo can not be created.")
+        create_nicologos = False
+
 
 print(citation)
 
@@ -135,15 +173,12 @@ def read_site_distribution_pd(fn, v=False):
     return data
 
 
-print("Read data.")
+print("Reading data.")
 data_array = list(map(read_site_distribution_pd, fns))
 data_conc = pd.concat(data_array, ignore_index=True)
 data = data_conc
+print("Done.")
 print(len(data), "site distributions read.")
-print("")
-
-print("First rows:")
-print(data.head())
 print("")
 
 
@@ -233,26 +268,34 @@ def lclr_inv_df(df):
     return df.apply(lclr_inv, axis=1)
 
 
+print("First rows of data:")
+print(data.head())
+print("")
+
 # Transform data.
-if transformation != "None":
-    print("Transform data.")
-    if transformation == "clr":
-        data_transformed = clr_df(data)
-        data_transformed_inv = clr_inv_df(data_transformed)
-    elif transformation == "lclr":
-        data_transformed = lclr_df(data)
-        data_transformed_inv = lclr_inv_df(data_transformed)
-    else:
-        raise ValueError("Transformation not known:", transformation)
-    print("Done.")
-    print("")
-    print("First rows of transformed data:")
-    print(data_transformed.head())
-    print("")
-    print("First rows of inversely transformed data (should be original data):")
-    print(data_transformed_inv.head())
-    print("")
-    data = data_transformed
+data_t = {}
+if "none" in ts:
+    data_t["none"] = data
+
+    ts.remove("none")
+if ts != ["none"]:
+    print("Transforming data.")
+if "clr" in ts:
+    data_t["clr"] = clr_df(data)
+    # print("First rows of CLR transformed data:")
+    # print(data_t["clr"].head())
+    # print("")
+    ts.remove("clr")
+if "lclr" in ts:
+    data_t["lclr"] = lclr_df(data)
+    # print("First rows of LCLR transformed data:")
+    # print(data_t["lclr"].head())
+    # print("")
+    ts.remove("lclr")
+if len(ts) > 0:
+    raise ValueError("Transformation(s) not known:", t)
+print("Done.")
+print("")
 
 
 def get_weights(ls):
@@ -271,123 +314,132 @@ def cluster(df, algorithm, args=(), kwds={}):
     return (labels, clusters)
 
 
-idx = pd.Index([i for i in range(k)], name=["Cluster index"])
+# Cluster and output.
+print("Clustering.")
+print("     K     T")
+for k in ks:
+    for t in data_t.keys():
+        data = data_t[t]
+        idx = pd.Index([i for i in range(k)], name=["Cluster index"])
 
-cls = pd.Index(["Weight", "Center"])
-clusters_all_lclr = pd.DataFrame([], index=idx, columns=cls)
+        cls = pd.Index(["Weight", "Center"])
+        clusters_all_lclr = pd.DataFrame([], index=idx, columns=cls)
 
-print("Number of clusters:", k)
+        print(str(k).rjust(6), t.rjust(6), sep='')
+        kwds = {'n_clusters': k, 'n_jobs': -1}
+        labels, clusters_raw = cluster(data, KMeans, kwds=kwds)
+        clusters = pd.DataFrame(clusters_raw)
+        clusters_freq = clusters.apply(lclr_inv, axis=1)
+        clusters_labels = labels
+        clusters_freq = clusters_freq.values.tolist()
+        weights = get_weights(clusters_labels)
 
-# Perform clustering.
-labels, clusters_raw = cluster(data, KMeans, kwds={'n_clusters': k})
-clusters = pd.DataFrame(clusters_raw)
-clusters_freq = clusters.apply(lclr_inv, axis=1)
-clusters_labels = labels
-clusters_freq = clusters_freq.values.tolist()
-weights = get_weights(clusters_labels)
+        if prefix is not None:
+            fbn = prefix + "_"
+        else:
+            fbn = ""
+        fbn += "EDM_" + str(k).zfill(4) + "_" + t
 
-# Output.
+        clusters_df_unsorted = pd.DataFrame({"Weight": weights,
+                                             "Center": clusters_freq})
+        clusters_df = clusters_df_unsorted.sort_values(by=["Weight"],
+                                                       ascending=False)
+
+        # Phylobayes.
+        fn = fbn + "_pb.txt"
+        with open(fn, 'x') as fo:
+            print("20", ' '.join(amino_acids), file=fo)
+            print(k, file=fo)
+            for w, c in zip(clusters_df["Weight"], clusters_df["Center"]):
+                print(w, np_array_to_string(c), file=fo)
+
+        # Nicologo.
+        if create_nicologos:
+            fn = fbn + "_nicologo"
+            fnt = fn + ".txt"
+            with open(fnt, 'x') as fo:
+                print(k, n_aa, file=fo)
+                i = 0
+                for w, c in zip(clusters_df["Weight"], clusters_df["Center"]):
+                    print(i, w, np_array_to_string(c), file=fo)
+                    i += 1
+            nl = "./prologo"
+            fnp = fn + ".ps"
+            subprocess.call([nl, fnt, fnp])
+
+        # IQ-TREE.
+        amino_acids_pb_dict = dict((a, i)
+                                   for a, i in
+                                   zip(amino_acids, range(n_aa)))
+        amino_acids_iqtree = ['A', 'R', 'N', 'D', 'C', 'Q', 'E', 'G', 'H', 'I',
+                              'L', 'K', 'M', 'F', 'P', 'S', 'T', 'W', 'Y', 'V']
+        amino_acids_iqtree_indices = [amino_acids_pb_dict[a]
+                                      for a in amino_acids_iqtree]
+        fn = fbn + "_iqtree.nex"
+        model_bn = "EDM" + str(k).zfill(4) + t.upper()
+        with open(fn, 'x') as fo:
+            print("#nexus", file=fo)
+            print("begin models;", file=fo)
+            i = 0
+            class_names = []
+            class_names_with_weight = []
+            for c, w in zip(clusters_df["Center"], clusters_df["Weight"]):
+                class_name = model_bn + "_C" + str(i).zfill(4)
+                class_names.append(class_name)
+                class_name_with_weight = class_name + ":1.0:" + str(w)
+                class_names_with_weight.append(class_name_with_weight)
+                # Convert the order to the one used in IQ-TREE.
+                c_iqtree = [c[i] for i in amino_acids_iqtree_indices]
+                print("frequency ", class_name, " = ",
+                      np_array_to_string(c_iqtree), ";", sep='', file=fo)
+                i += 1
+            print("", file=fo)
+            print("frequency ", model_bn, " = FMIX{",
+                  ','.join(class_names_with_weight),
+                  "};", sep='', file=fo)
+            print("frequency ", model_bn, "Opt = FMIX{",
+                  ','.join(class_names),
+                  "};", sep='', file=fo)
+            print("end;", file=fo)
+
+        # RevBayes.
+        fn = fbn + "_rb.txt"
+        fn_basename_rb = fbn + "_rb"
+
+        options = np.get_printoptions()
+        np.set_printoptions(precision=16, threshold=None, linewidth=0)
+
+        with open(fn, 'x') as fo:
+            print("# This script is generated automatically.", file=fo)
+            print("# Vector of amino acid stationary distributions.", file=fo)
+            print("distributions <- [", file=fo)
+            idt = "            "
+            first = True
+            for c in clusters_df["Center"]:
+                if first:
+                    print(idt, "  ", c, sep='', file=fo)
+                    first = False
+                else:
+                    print(idt, ", ", c, sep='', file=fo)
+            print(idt, "]", sep='', file=fo)
+            print("# The number of clusters.", file=fo)
+            print("n_clusters <- ", k, sep='', file=fo)
+            print("# The base file name of this file (for reproducibility).",
+                  file=fo)
+            print("fn_distributions = \"", fn_basename_rb,
+                  "\"", sep='', file=fo)
+
+        np.set_printoptions(options)
+
 if prefix is not None:
     fbn = prefix + "_"
 else:
     fbn = ""
-fbn += "dists_" + transformation + "_" + str(k).zfill(3) + "clusters"
+fbn += "EDM_XXXX_TRNS_EXTENSION"
+print("Output written to files of the following form:", fbn)
+expl = """where TRNS is the transformation, XXXX is the number of clusters, and EXT is
+an extension which depends on the software package. """
+print(expl)
 
-clusters_df_unsorted = pd.DataFrame({"Weight": weights,
-                                     "Center": clusters_freq})
-clusters_df = clusters_df_unsorted.sort_values(by=["Weight"],
-                                               ascending=False)
 
-# Phylobayes.
-print("Write Phylobayes compatible output.")
-fn = fbn + "_pb.txt"
-with open(fn, 'w') as fo:
-    print("20", ' '.join(amino_acids), file=fo)
-    print(k, file=fo)
-    for w, c in zip(clusters_df["Weight"], clusters_df["Center"]):
-        print(w, np_array_to_string(c), file=fo)
-
-# # Nicologo.
-# if create_nicologos:
-#     if not os.path.isfile("modeheader"):
-#         print("WARNING: File 'modeheader' is missing, " +
-#               "Nicologo can not be created.")
-#         create_nicologos = False
-#     elif not os.path.isfile("seqheader"):
-#         print("WARNING: File 'seqheader' is missing, " +
-#               "Nicologo can not be created.")
-#         create_nicologos = False
-#     elif not os.path.isfile("prologo"):
-#         print("WARNING: Executable 'prologo' is missing, " +
-#               "Nicologo can not be created.")
-#         create_nicologos = False
-
-# if create_nicologos:
-#     fn = fbn + "_nicologo"
-#     fnt = fn + ".txt"
-#     with open(fnt, 'w') as fo:
-#         print(k, n_aa, file=fo)
-#         i = 0
-#         for w, c in zip(clusters_df["Weight"], clusters_df["Center"]):
-#             print(i, w, np_array_to_string(c), file=fo)
-#             i += 1
-#     nl = "./prologo"
-#     fnp = fn + ".ps"
-#     subprocess.call([nl, fnt, fnp])
-
-# IQ-TREE.
-print("Write IQ-TREE compatible output.")
-amino_acids_pb_dict = dict((a, i)
-                           for a, i in
-                           zip(amino_acids, range(n_aa)))
-amino_acids_iqtree = ['A', 'R', 'N', 'D', 'C', 'Q', 'E', 'G', 'H', 'I',
-                      'L', 'K', 'M', 'F', 'P', 'S', 'T', 'W', 'Y', 'V']
-amino_acids_iqtree_indices = [amino_acids_pb_dict[a]
-                              for a in amino_acids_iqtree]
-fn = fbn + "_iqtree.nex"
-with open(fn, 'w') as fo:
-    print("#nexus", file=fo)
-    print("begin models;", file=fo)
-    i = 0
-    class_names = []
-    for c in clusters_df["Center"]:
-        class_name = "FClass" + str(i).zfill(3)
-        class_names.append(class_name)
-        # Convert the order to the one used in IQ-TREE.
-        c_iqtree = [c[i] for i in amino_acids_iqtree_indices]
-        print("frequency ", class_name, " = ",
-              np_array_to_string(c_iqtree), ";", sep='', file=fo)
-        i += 1
-    print("", file=fo)
-    print("frequency CF", str(k).zfill(3), "Model = FMIX{",
-          ','.join(class_names), "};", sep='', file=fo)
-    print("end;", file=fo)
-
-# RevBayes.
-print("Write RevBayes compatible output.")
-fn = fbn + "_rb.txt"
-fn_basename_rb = fbn + "_rb"
-
-options = np.get_printoptions()
-np.set_printoptions(precision=16, threshold=None, linewidth=0)
-
-with open(fn, 'w') as fo:
-    print("# This script is generated automatically.", file=fo)
-    print("# Vector of amino acid stationary distributions.", file=fo)
-    print("distributions <- [", file=fo)
-    idt = "            "
-    first = True
-    for c in clusters_df["Center"]:
-        if first:
-            print(idt, "  ", c, sep='', file=fo)
-            first = False
-        else:
-            print(idt, ", ", c, sep='', file=fo)
-    print(idt, "]", sep='', file=fo)
-    print("# The number of clusters.", file=fo)
-    print("n_clusters <- ", k, sep='', file=fo)
-    print("# The base file name of this file (for reproducability).",
-          file=fo)
-    print("fn_distributions = \"", fn_basename_rb, "\"", sep='', file=fo)
-
-np.set_printoptions(options)
+print("Done.")
