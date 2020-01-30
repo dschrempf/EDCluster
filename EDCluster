@@ -101,9 +101,11 @@ def parse_arguments():
                         help="Use specific transformation.")
     parser.add_argument("-k", type=int,
                         help="Use specific number of clusters.")
+    parser.add_argument("-n", action="store_true",
+                        help="Also create Nicologos.")
     parser.add_argument('-p', help="Prefix of output files.",
                         default=None)
-    parser.add_argument('-v', action='version',
+    parser.add_argument('-v', action="version",
                         version="%(prog)s version " + version)
     return parser.parse_args()
 
@@ -133,22 +135,24 @@ prefix = args.p
 amino_acids = ["A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P",
                "Q", "R", "S", "T", "V", "W", "Y"]
 n_aa = 20
-create_nicologos = False
+
+# Check for Nicologo files.
+create_nicologos = args.n
 if create_nicologos:
     if not os.path.isfile("modeheader"):
-        print("WARNING: File 'modeheader' is missing, " +
+        print("ERROR: File 'modeheader' is missing, " +
               "Nicologo can not be created.")
-        create_nicologos = False
+        raise ValueError()
     elif not os.path.isfile("seqheader"):
-        print("WARNING: File 'seqheader' is missing, " +
+        print("ERROR: File 'seqheader' is missing, " +
               "Nicologo can not be created.")
-        create_nicologos = False
+        raise ValueError()
     elif not os.path.isfile("prologo"):
-        print("WARNING: Executable 'prologo' is missing, " +
+        print("ERROR: Executable 'prologo' is missing, " +
               "Nicologo can not be created.")
-        create_nicologos = False
+        raise ValueError()
 
-
+# Citation.
 print(citation)
 
 
