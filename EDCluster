@@ -119,13 +119,13 @@ def parse_arguments():
 
 args = parse_arguments()
 
-if args.continue_run and (args.filenames is not []):
+if args.continue_run and (args.filenames != []):
     print("WARNING: Saved data will be used for clustering.")
     print("WARNING: Given input files will be ignored:")
     print(args.filenames)
     print("WARNING: If this is not intended, please remove the option [--continue-run].")
-elif (not args.continue_run) and (args.filenames is []):
-    print("ERROR: No file names given.")
+elif (not args.continue_run) and (args.filenames == []):
+    raise ValueError("No file names given.")
 else:
     fns = args.filenames
 
