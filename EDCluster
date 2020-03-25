@@ -109,7 +109,7 @@ def parse_arguments():
     parser.add_argument('--pickle-only',
                         help="Read, transform, and save data; then exit.",
                         action="store_true")
-    parser.add_argument('--continue',
+    parser.add_argument('--continue-run',
                         help="Use saved data for clustering.",
                         action="store_true")
     parser.add_argument('-v', action="version",
@@ -119,11 +119,11 @@ def parse_arguments():
 
 args = parse_arguments()
 
-if (args.continue) and (args.filenames is not None):
+if (args.continue_run) and (args.filenames is not None):
     print("WARNING: Saved data will be used for clustering.")
     print("WARNING: Given input files will be ignored:")
     print(args.filenames)
-    print("WARNING: If this is not intended, please remove the option [--continue].")
+    print("WARNING: If this is not intended, please remove the option [--continue-run].")
 else:
     fns = args.filenames
 
@@ -281,7 +281,7 @@ def lclr_inv_df(df):
 
 
 # Read data.
-if args.continue:
+if args.continue_run:
     print("Read saved data frame.")
     data = pd.read_pickle(data_pickle_fn)
     print("Done.")
@@ -300,7 +300,7 @@ print(data.head())
 print("")
 
 # Transform data.
-if args.continue:
+if args.continue_run:
     print("Read saved transformed data frame.")
     data_t = pd.read_pickle(datat_pickle_fn)
     print("Done.")
