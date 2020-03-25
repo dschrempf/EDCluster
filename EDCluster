@@ -106,15 +106,26 @@ def parse_arguments():
                         help="Also create Nicologos.")
     parser.add_argument('-p', help="Prefix of output files.",
                         default=None)
-    parser.add_argument('--pickle-only', help"Read, transform, and save data; then exit.")
-    parser.add_argument('--continue', help="Use saved data for clustering.")
+    parser.add_argument('--pickle-only',
+                        help"Read, transform, and save data; then exit.",
+                        action="store_true")
+    parser.add_argument('--continue',
+                        help="Use saved data for clustering.",
+                        action="store_true")
     parser.add_argument('-v', action="version",
                         version="%(prog)s version " + version)
     return parser.parse_args()
 
 
 args = parse_arguments()
-fns = args.filenames
+
+if (args.continue) and (args.filenames is not None):
+    print("WARNING: Saved data will be used for clustering.")
+    print("WARNING: Given input files will be ignored:")
+    print(args.filenames)
+    print("WARNING: If this is not intended, please remove the option [--continue].")
+else:
+    fns = args.filenames
 
 data_pickle_fn = ".edcluster.data.pickle"
 datat_pickle_fn = ".edcluster.datat.pickle"
