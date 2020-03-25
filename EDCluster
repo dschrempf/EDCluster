@@ -122,7 +122,7 @@ else:
 
 k = args.k
 if k is None:
-    ks = [4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048]
+    ks = [4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096]
 else:
     if k > 9999:
         raise ValueError("It is not advised to use so many components. Abort.")
@@ -323,7 +323,7 @@ print("     K     T")
 for k in ks:
     for t in data_t.keys():
         data = data_t[t].copy()
-        idx = pd.Index([i for i in range(k)], name=["Cluster index"])
+        idx = pd.Index([i for i in range(k)], name="Cluster index")
 
         cls = pd.Index(["Weight", "Center"])
         clusters_all_lclr = pd.DataFrame([], index=idx, columns=cls)
