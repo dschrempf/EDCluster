@@ -329,7 +329,7 @@ else:
     if len(ts) > 0:
         raise ValueError("Transformation(s) not known:", t)
     print("Done.")
-    data.to_pickle(datat_pickle_fn)
+    data_t.to_pickle(datat_pickle_fn)
     print("")
 
 if args.pickle_only:
