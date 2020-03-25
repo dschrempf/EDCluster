@@ -3,6 +3,7 @@ import argparse
 import subprocess
 from functools import reduce
 import os
+import pickle
 
 from math import exp
 from math import log
@@ -105,6 +106,8 @@ def parse_arguments():
                         help="Also create Nicologos.")
     parser.add_argument('-p', help="Prefix of output files.",
                         default=None)
+    parser.add_argument('--pickle-only', help"Read, transform, and save data; then exit.")
+    parser.add_argument('--continue', help="Use saved data for clustering.")
     parser.add_argument('-v', action="version",
                         version="%(prog)s version " + version)
     return parser.parse_args()
@@ -112,6 +115,9 @@ def parse_arguments():
 
 args = parse_arguments()
 fns = args.filenames
+
+data_pickle_fn = ".edcluster.data.pickle"
+datat_pickle_fn = ".edcluster.datat.pickle"
 
 # By default, use all combinations.
 t = args.t
@@ -175,15 +181,6 @@ def read_site_distribution_pd(fn, v=False):
     # Set labels accordingly.
     data.columns = amino_acids
     return data
-
-
-print("Reading data.")
-data_array = list(map(read_site_distribution_pd, fns))
-data_conc = pd.concat(data_array, ignore_index=True)
-data = data_conc
-print("Done.")
-print(len(data), "site distributions.")
-print("")
 
 
 # Definitions of transformations.
@@ -272,33 +269,57 @@ def lclr_inv_df(df):
     return df.apply(lclr_inv, axis=1)
 
 
+# Read data.
+if args.continue:
+    print("Read saved data frame.")
+    data = pd.read_pickle(data_pickle_fn)
+    print("Done.")
+else:
+    print("Reading input files.")
+    data_array = list(map(read_site_distribution_pd, fns))
+    data_conc = pd.concat(data_array, ignore_index=True)
+    data = data_conc
+    data.to_pickle(data_pickle_fn)
+    print("Done.")
+    print(len(data), "site distributions.")
+    print("")
+
 print("First rows of data:")
 print(data.head())
 print("")
 
 # Transform data.
-data_t = {}
-if "none" in ts:
-    data_t["none"] = data.copy()
-    ts.remove("none")
-if ts != ["none"]:
-    print("Transforming data.")
-if "clr" in ts:
-    data_t["clr"] = clr_df(data.copy())
-    # print("First rows of CLR transformed data:")
-    # print(data_t["clr"].head())
-    # print("")
-    ts.remove("clr")
-if "lclr" in ts:
-    data_t["lclr"] = lclr_df(data.copy())
-    # print("First rows of LCLR transformed data:")
-    # print(data_t["lclr"].head())
-    # print("")
-    ts.remove("lclr")
-if len(ts) > 0:
-    raise ValueError("Transformation(s) not known:", t)
-print("Done.")
-print("")
+if args.continue:
+    print("Read saved transformed data frame.")
+    data_t = pd.read_pickle(datat_pickle_fn)
+    print("Done.")
+else:
+    data_t = {}
+    if "none" in ts:
+        data_t["none"] = data.copy()
+        ts.remove("none")
+    if ts != ["none"]:
+        print("Transforming data.")
+    if "clr" in ts:
+        data_t["clr"] = clr_df(data.copy())
+        # print("First rows of CLR transformed data:")
+        # print(data_t["clr"].head())
+        # print("")
+        ts.remove("clr")
+    if "lclr" in ts:
+        data_t["lclr"] = lclr_df(data.copy())
+        # print("First rows of LCLR transformed data:")
+        # print(data_t["lclr"].head())
+        # print("")
+        ts.remove("lclr")
+    if len(ts) > 0:
+        raise ValueError("Transformation(s) not known:", t)
+    print("Done.")
+    print("")
+
+if args.pickle_only:
+    print("Pickled data and transformed data. Exit!")
+    exit()
 
 
 def get_weights(ls):
