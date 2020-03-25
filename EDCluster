@@ -107,7 +107,7 @@ def parse_arguments():
     parser.add_argument('-p', help="Prefix of output files.",
                         default=None)
     parser.add_argument('--pickle-only',
-                        help"Read, transform, and save data; then exit.",
+                        help="Read, transform, and save data; then exit.",
                         action="store_true")
     parser.add_argument('--continue',
                         help="Use saved data for clustering.",
