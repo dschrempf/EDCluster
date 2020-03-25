@@ -95,9 +95,8 @@ def parse_arguments():
         formatter_class=CustomFormatter,
         description=desc,
         epilog=epilog)
-    parser.add_argument("filenames", nargs='+',
-                        help="Names of files containing site distributions",
-                        default=None)
+    parser.add_argument("filenames", nargs='*',
+                        help="Names of files containing site distributions")
     parser.add_argument("-t",
                         choices=["none", "clr", "lclr"],
                         help="Use specific transformation.")
@@ -120,12 +119,12 @@ def parse_arguments():
 
 args = parse_arguments()
 
-if args.continue_run and (args.filenames is not None):
+if args.continue_run and (args.filenames is not []):
     print("WARNING: Saved data will be used for clustering.")
     print("WARNING: Given input files will be ignored:")
     print(args.filenames)
     print("WARNING: If this is not intended, please remove the option [--continue-run].")
-elif (not args.continue_run) and (args.filenames is None):
+elif (not args.continue_run) and (args.filenames is []):
     print("ERROR: No file names given.")
 else:
     fns = args.filenames
@@ -304,8 +303,9 @@ print("")
 
 # Transform data.
 if args.continue_run:
-    print("Read saved transformed data frame.")
-    data_t = pd.read_pickle(datat_pickle_fn)
+    print("Read saved transformed data.")
+    with open(datat_pickle_fn, "rb") as fo:
+        data_t = pickle.load(fo)
     print("Done.")
 else:
     data_t = {}
@@ -329,7 +329,8 @@ else:
     if len(ts) > 0:
         raise ValueError("Transformation(s) not known:", t)
     print("Done.")
-    data_t.to_pickle(datat_pickle_fn)
+    with open(datat_pickle_fn, "wb") as fo:
+        pickle.dump(data_t, fo)
     print("")
 
 if args.pickle_only:
