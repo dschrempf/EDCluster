@@ -1,5 +1,7 @@
 * Empirical distribution mixture models
-
+:PROPERTIES:
+:ID:       745ea265-11d5-4df8-a0b8-669126be43bb
+:END:
 For your reference, please see and cite the [[https://www.biorxiv.org/content/10.1101/794263v1][preprint uploaded to bioRxiv.]]
 
 Empirical distribution mixture models assume that evolution occurs along a
@@ -47,8 +49,9 @@ or RevBayes [9].
 
 #+RESULTS: Help
 #+begin_example
-usage: EDCluster [-h] [-t {none,clr,lclr}] [-k K] [-p P] [-v]
-                 filenames [filenames ...]
+usage: EDCluster [-h] [-t {none,clr,lclr}] [-k K] [-n] [-p P] [--pickle-only]
+                 [--continue-run] [-v]
+                 [filenames [filenames ...]]
 
 EDCluster version 2.0.0.
 Developed by Dominik Schrempf (2020). 
@@ -89,13 +92,18 @@ EDM model with a specific number of components, as well as a specific
 transformation can be achieved with the -k, and -t options (see below). 
 
 positional arguments:
-  filenames           Names of files containing site distributions
+  filenames           Names of files containing site distributions (default:
+                      None)
 
 optional arguments:
   -h, --help          show this help message and exit
   -t {none,clr,lclr}  Use specific transformation. (default: None)
   -k K                Use specific number of clusters. (default: None)
+  -n                  Also create Nicologos. (default: False)
   -p P                Prefix of output files. (default: None)
+  --pickle-only       Read, transform, and save data; then exit. (default:
+                      False)
+  --continue-run      Use saved data for clustering. (default: False)
   -v                  show program's version number and exit
 
 [1] Nguyen, L., Schmidt, H. A., von Haeseler, A., & Minh, B. Q. (2015).
