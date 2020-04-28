@@ -305,7 +305,10 @@ print("")
 if args.continue_run:
     print("Read saved transformed data.")
     with open(datat_pickle_fn, "rb") as fo:
-        data_t = pickle.load(fo)
+        data_t_loaded = pickle.load(fo)
+        data_t = {}
+        for key in ts:
+            data_t[key] = data_t_loaded[key]
     print("Done.")
 else:
     data_t = {}
