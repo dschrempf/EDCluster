@@ -42,17 +42,11 @@ been termed **UDM models**. UDM models with 4, 8, 16, 32, 64, 128, 192, 256, 512
 with several established phylogenetic software packages such as IQ-TREE [7],
 Phylobayes [8], or RevBayes [9].
 
-The files are named in the following format:
+For each combination of parameters (data base, number of parameters,
+transformation, and software package), the file is named in the following
+format:
 
     udm_${database}_${nclusters}_${transformation}_${software}.extension
-
-For each combination of parameters (data base, number of parameters,
-transformation), three files are provided; one for each of the following
-software packages
-
--   IQ-TREE [7],
--   Phylobayes [8], and
--   RevBayes [9].
 
 Additionally, postscript files show customized WebLogos of the distributions
 (for details please refer to the main text, [0]). For example, the components as
@@ -73,7 +67,7 @@ abbreviated by `ALI`.
 
 ## IQ-TREE
 
-The `*iqtree.nex` file defines a frequency mixture model (FMIX). The FMIX model
+The `*iqtree.nex` files define frequency mixture models (FMIX). The FMIX model
 is called, for example, `UDM0004LCLR`. The corresponding analysis using the UDM
 model with four components obtained from the HOGENOM database with the LCLR
 transformation can be run with
@@ -95,7 +89,8 @@ for example, be run with
 
 ## RevBayes
 
-For sample RevBayes scripts, please refer to the supplement.
+For sample RevBayes scripts, please refer to the supplement distributed together
+with the main text [0].
 
 
 # EDCluster help
