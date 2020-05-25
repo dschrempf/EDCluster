@@ -1,10 +1,5 @@
 * Empirical distribution mixture models
-:PROPERTIES:
-:ID:       745ea265-11d5-4df8-a0b8-669126be43bb
-:END:
-
 # TODO: Update reference after publication.
-
 For your reference, please see and cite the [[https://www.biorxiv.org/content/10.1101/794263v1][preprint uploaded to bioRxiv]] [0].
 
 Empirical distribution mixture models assume that evolution occurs along a
@@ -183,8 +178,7 @@ Clustering transformed compositional data using K-means, with applications in
 gene expression and bicycle sharing system data. ArXiv, 1–32.
 #+end_example
 
-* Footnotes
-
+* References
 [0] Schrempf, D., Lartillot, N., & Szöllősi, G., Scalable empirical mixture
 models that account for across-site compositional heterogeneity, bioRxiv,
 (2020). http://dx.doi.org/10.1101/794263
@@ -228,10 +222,3 @@ http://dx.doi.org/10.1093/sysbio/syt022
 B. R., Huelsenbeck, J. P., …, Revbayes: bayesian phylogenetic inference using
 graphical models and an interactive model-specification language, Systematic
 Biology, 65(4), 726–736 (2016). http://dx.doi.org/10.1093/sysbio/syw021
-
-
-
-
-
-
-
