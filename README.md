@@ -1,7 +1,7 @@
 
 # Empirical distribution mixture models
 
-For your reference, please see and cite the [preprint uploaded to bioRxiv.](https://www.biorxiv.org/content/10.1101/794263v1)
+For your reference, please see and cite the [preprint uploaded to bioRxiv](https://www.biorxiv.org/content/10.1101/794263v1) [0].
 
 Empirical distribution mixture models assume that evolution occurs along a
 species tree according to a mixture of amino acid substitution models. The
@@ -28,16 +28,77 @@ exhibiting specific different features are moved further apart from each other,
 so that they fall into different groups in the subsequent analysis.
 
 K-means clustering with Scikit-Learn [4] is used to group the prepared site
-distributions into 4, 8, 16, 32, 64, 128, and 256 clusters. The cluster centers,
-which are the stationary distributions, and weights can be used as components of
-EDM models.
+distributions into clusters. The cluster centers, which are the stationary
+distributions, and weights can be used as components of EDM models.
+
+
+# UDM models
 
 Further, sets of stationary distributions and weights estimated from subsets of
 the HOGENOM [5] and HSSP [6] data bases, as well as a union of both are
 provided. Empirical distribution mixture models resulting from these sets have
-been termed **UDM models**. The files can directly be used with several
-established phylogenetic softwware packages such as IQ-TREE [7], Phylobayes [8],
-or RevBayes [9].
+been termed **UDM models**. UDM models with 4, 8, 16, 32, 64, 128, 192, 256, 512,
+1024, 2048, and 4096 components are provided. The files can directly be used
+with several established phylogenetic software packages such as IQ-TREE [7],
+Phylobayes [8], or RevBayes [9].
+
+The files are named in the following format:
+
+    udm_${database}_${nclusters}_${transformation}_${software}.extension
+
+For each combination of parameters (data base, number of parameters,
+transformation), three files are provided; one for each of the following
+software packages
+
+-   IQ-TREE [7],
+-   Phylobayes [8], and
+-   RevBayes [9].
+
+Additionally, postscript files show customized WebLogos of the distributions
+(for details please refer to the main text, [0]). For example, the components as
+well as the corresponding logos of the UDM model with four components obtained
+from the HOGENOM database with the LCLR transformation are listed in these
+files:
+
+    udm_hogenom_0004_lclr_iqtree.nex
+    udm_hogenom_0004_lclr_pb.txt
+    udm_hogenom_0004_lclr_rb.txt
+    udm_hogenom_0004_lclr_nicologo.ps
+
+Additionally, for IQ-TREE all distributions are conveniently summarized into a
+file `udm_models_${transformation}.nex`. The following command line examples
+show how these files can be used. The analyzed multisequence alignment is
+abbreviated by `ALI`.
+
+
+## IQ-TREE
+
+The `*iqtree.nex` file defines a frequency mixture model (FMIX). The FMIX model
+is called, for example, `UDM0004LCLR`. The corresponding analysis using the UDM
+model with four components obtained from the HOGENOM database with the LCLR
+transformation can be run with
+
+    iqtree -s ALI -mdef udm_models_hogenom.nex -m Poisson+UDM0004LCLR -mwopt
+
+Of course, other exchangeabilities such as the ones of the LG model can be used,
+although we do not advice the usage of non-uniform exchangeabilities, and did
+not test the performance of non-uniform exchangeabilities extensively.
+
+
+## Phylobayes
+
+The `*pb.txt` file defines the components. A UDM model analysis can,
+for example, be run with
+
+    pb_mpi -d ALI -poisson -catfix udm_hogenom_0004_lclr_pb.txt -s CHAIN_NAME
+
+
+## RevBayes
+
+For sample RevBayes scripts, please refer to the supplement.
+
+
+# EDCluster help
 
     usage: EDCluster [-h] [-t {none,clr,lclr}] [-k K] [-n] [-p P] [--pickle-only]
                      [--continue-run] [-v]
